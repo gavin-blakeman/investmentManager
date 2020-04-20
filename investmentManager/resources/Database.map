@@ -1,0 +1,80 @@
+﻿; Map file for SAMAP application
+
+TABLE [core_countries]
+  COLUMN [ID]
+  COLUMN [CountryName]
+  COLUMN [CountryCode]
+  COLUMN [Currency_ID]
+  COLUMN [Available]
+END
+
+TABLE [core_currencies]
+  COLUMN [ID]
+  COLUMN [CurrencyCode]
+  COLUMN [CurrencyName]
+  COLUMN [MinorUnit]
+  COLUMN [NotAvailable]
+END
+
+TABLE [chem_chemicalStates] =
+  COLUMN [ID] =
+  COLUMN [ChemicalState] =
+END
+
+TABLE [chem_chemicalData] =
+  COLUMN[ID] =
+  COLUMN [ChemicalName] =
+  COLUMN [UNNo] =
+  COLUMN [ChemicalState_ID] =
+  COLUMN [Available] =
+END
+
+TABLE [tbl_maintenanceRecords] =
+  COLUMN [ID] =
+  COLUMN [PlantRegister_ID] =
+  COLUMN [MaintenanceSchedule_ID] =
+  COLUMN [MaintenanceDate] =
+  COLUMN [WONumber] =
+  COLUMN [MaintenanceDescription] =
+  COLUMN [version] =
+END
+
+TABLE [tbl_maintenanceSchedule]
+  COLUMN [ID] =
+  MaintenanceStrategy_ID =
+  TaskDescription =
+  TaskAbbreviation =
+  TaskDetails =
+  UsageValue =
+  Removed =
+  version =
+TABLEEND
+
+TABLESTART tbl_meterPointData =
+  ID =
+  MeterPoint_ID =
+  MeterDate =
+  Value =
+TABLEEND
+
+TABLESTART tbl_meterPoints =
+  PlantRegister_ID =
+  Description =
+  UOM_ID =
+  MinimumValue =
+  MaximumValue =
+  MaximumUsage =
+  Retired =
+  version =
+TABLEEND
+
+TABLESTART tbl_plantRegister =
+  ID =
+  OperatingUnit_ID =
+  EquipmentClass_ID =
+  Identifier =
+  Description =
+  Parent_ID =
+  Retired =
+  version =
+TABLEEND

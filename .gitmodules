@@ -1,0 +1,9 @@
+[submodule "MCL"]
+	path = MCL
+	url = https://github.com/gavin-blakeman/MCL.git
+[submodule "GCL"]
+	path = GCL
+	url = https://github.com/gavin-blakeman/GCL.git
+[submodule "SCL"]
+	path = SCL
+	url = https://github.com/gavin-blakeman/SCL.git
