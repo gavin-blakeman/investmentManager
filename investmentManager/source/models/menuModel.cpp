@@ -35,6 +35,7 @@
   // Standard C++ library header files.
 
 #include <any>
+#include <utility>
 
   // Wt++ library header files
 
@@ -50,24 +51,8 @@
   // investmentManager header files.
 
 
-
 namespace models
 {
-
-//  struct SMenuEntry
-//  {
-//    transaction_t parentID;
-//    std::string   menuText;
-//    std::string   transactionCode;
-//    bool          selectable;
-//    std::uint8_t  menuLevel;
-
-//    //SMenuEntry(transaction_t pid, std::string const &mt, std::string const &tc, bool s, std::uint8_t ml)
-//    //  : parentID(pid), menuText(mt), transactionCode(tc), selectable(s), menuLevel(ml) {}
-
-//  };
-
-//  typedef std::map<transaction_t, SMenuEntry> menuMap_t;
 
   /// @brief Constructor for the menu model. This also loads the data from the menu data table.
   /// @param[in] sqlSession: The SQL session to use for loading the data.
@@ -104,15 +89,16 @@ namespace models
       Wt::Dbo::collection<std::tuple<std::int32_t, std::int32_t, std::int32_t, std::string, std::string>> transactionResult;
 
       transactionResult = sqlSession.query<std::tuple<std::int32_t, std::int32_t, std::int32_t, std::string, std::string>>
-              ("SELECT DISTINCT tbl_transactions.ID, tbl_transactions.parentID, "
-               "                tbl_transactions.SortOrder, tbl_transactions.MenuText, tbl_transactions.TransactionCode " \
-               "FROM tbl_transactions");
+              ("SELECT DISTINCT im_transactions.ID, im_transactions.parentID, "
+               "                im_transactions.SortOrder, im_transactions.MenuText, im_transactions.TransactionCode " \
+               "FROM im_transactions");
 
       for (auto iterator = transactionResult.begin(); iterator != transactionResult.end(); ++iterator)
       {
-//        menuHierarchy.insert(std::get<0>(*iterator), std::get<1>(*iterator),
-//                             std::make_pair(std::get<2>(*iterator) + " - " + std::get<3>(*iterator),
-//                                            std::get<4>(*iterator).empty() ? false : true));
+        menuHierarchy.insert(std::get<0>(*iterator),  // ID
+                             std::get<1>(*iterator),  // Parent ID
+                             std::make_pair(std::get<3>(*iterator),   // Menu Text
+                                            std::get<4>(*iterator))); // Transaction code
       };
     };
 
@@ -122,9 +108,7 @@ namespace models
     {
       level = std::get<0>(*iterator);     // Level in the hierarchy
 
-      //std::string itemName = std::get<2>(*iterator);    // Not sure why this is working.
-
-      //newItem = std::make_unique<Wt::WStandardItem>(itemName);
+      newItem = std::make_unique<Wt::WStandardItem>(std::get<2>(*iterator).first);
       newItem->setData(std::get<1>(*iterator), Wt::ItemDataRole::User); // Index = transaction ID
 
       if (level == 0) // Special case for level 0.

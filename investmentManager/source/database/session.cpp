@@ -84,14 +84,14 @@ namespace database
   {
     try
     {
-      mapClass<Wt::Auth::Dbo::AuthInfo<database::tbl_users>>("tbl_authInfo");
-      mapClass<Wt::Auth::Dbo::AuthInfo<database::tbl_users>::AuthIdentityType>("tbl_authIdentity");
-      mapClass<Wt::Auth::Dbo::AuthInfo<database::tbl_users>::AuthTokenType>("tbl_authToken");
+      mapClass<Wt::Auth::Dbo::AuthInfo<database::tbl_users>>("im_authInfo");
+      mapClass<Wt::Auth::Dbo::AuthInfo<database::tbl_users>::AuthIdentityType>("im_authIdentity");
+      mapClass<Wt::Auth::Dbo::AuthInfo<database::tbl_users>::AuthTokenType>("im_authToken");
 
-      mapClass<tbl_users>("tbl_users");
+      mapClass<tbl_users>("im_users");
       users_ = std::make_unique<Wt::Auth::Dbo::UserDatabase<Wt::Auth::Dbo::AuthInfo<database::tbl_users>>>(*this);
 
-      mapClass<tbl_transactions>("tbl_transactions");
+      mapClass<tbl_transactions>("im_transactions");
     }
     catch (Wt::Dbo::Exception &e)
     {

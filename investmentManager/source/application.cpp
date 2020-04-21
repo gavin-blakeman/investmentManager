@@ -74,8 +74,6 @@ CApplication::CApplication(Wt::WEnvironment const &env, Wt::Dbo::SqlConnectionPo
   useStyleSheet("wt.css");
   setCssTheme("polished");
 
-  //menuModel = std::make_shared<models::CMenuModel>();
-
   setTitle(APPLICATION_NAME);
 
   createUI();
@@ -91,6 +89,8 @@ void CApplication::authenticationEvent()
   if (sqlSession_.login().loggedIn())
   {
     //std::cout << "UserID: " << sqlSession_.userID() << std::endl;
+
+    menuModel = std::make_shared<models::CMenuModel>(sqlSession_);
 
     //loadMenuData(sqlSession_);
     //createTransactionMap();
