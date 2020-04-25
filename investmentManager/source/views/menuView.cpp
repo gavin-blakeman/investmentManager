@@ -42,6 +42,9 @@
 #include "include/transactions.h"
 
 /// @brief Constructor for the menu tree view.
+/// @param[in] np: The application object that owns this.
+/// @param[in] menuModel: The menu model containing the menu data.
+/// @throws std::bad_alloc
 /// @version 2020-04-19/GGB - Function created.
 
 CMenuView::CMenuView(CApplication *np, std::shared_ptr<models::CMenuModel> &menuModel) : Wt::WTreeView(), parent(np)
@@ -60,7 +63,6 @@ CMenuView::CMenuView(CApplication *np, std::shared_ptr<models::CMenuModel> &menu
 /// @note 1. There is the possibility of exceptions being raised during the std::any_cast process. These are intentionally kept
 ///          within this function and not allowed to propogate.
 /// @version 2020-04-19/GGB - Function created.
-
 
 void CMenuView::menuItemChanged()
 {

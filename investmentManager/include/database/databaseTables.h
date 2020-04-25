@@ -35,8 +35,11 @@
 
 namespace database
 {
+  class tbl_applicationData;
   class tbl_users;
   class tbl_transactions;
+  class tbl_commodities;
+  class tbl_prices;
 }
 
 #endif // DATABASETABLES_H

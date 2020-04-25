@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                databaseDefinitions.h
-// SUBSYSTEM:           Common definitions for database types etc.
+// FILE:                /core/priceUpload/yahooPrices.h
+// SUBSYSTEM:           Classes to upload commodity prices from file.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,23 +26,11 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-04-25/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef DATABASEDEFINITIONS_H
-#define DATABASEDEFINITIONS_H
+#ifndef YAHOOPRICES_H
+#define YAHOOPRICES_H
 
-  // Standard C++ header files
-
-#include <cstdint>
-#include <string>
-
-namespace database
-{
-  typedef std::int32_t index_t;
-  using GUID_t = std::string;
-
-} // namespace database
-
-#endif // DATABASEDEFINITIONS_H
+#endif // YAHOOPRICES_H

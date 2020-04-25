@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                databaseDefinitions.h
-// SUBSYSTEM:           Common definitions for database types etc.
+// FILE:                investorContributions.h
+// SUBSYSTEM:           Investor/Member Review of own contributions
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,23 +26,30 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-04-22/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef DATABASEDEFINITIONS_H
-#define DATABASEDEFINITIONS_H
+#ifndef INVESTORCONTRIBUTIONS_H
+#define INVESTORCONTRIBUTIONS_H
 
-  // Standard C++ header files
+#include "transactionPage.h"
 
-#include <cstdint>
-#include <string>
-
-namespace database
+namespace transactions
 {
-  typedef std::int32_t index_t;
-  using GUID_t = std::string;
 
-} // namespace database
+  class CInvestorContributions : CTransactionPage
+  {
+  private:
 
-#endif // DATABASEDEFINITIONS_H
+    CInvestorContributions() = delete;
+    CInvestorContributions(CInvestorContributions const &) = delete;
+    CInvestorContributions(CInvestorContributions const &&) = delete;
+
+  public:
+    CInvestorContributions(CApplication *parent) : CTransactionPage(parent) {}
+  };
+
+} // namespace transactions
+
+#endif // INVESTORCONTRIBUTIONS_H

@@ -70,7 +70,12 @@ SOURCES += \
     source/views/menuView.cpp \
     source/database/tbl_users.cpp \
     source/configSettings.cpp \
-    source/investmentManager.cpp
+    source/investmentManager.cpp \
+    source/transactionPages/investorContributions.cpp \
+    source/transactionPages/priceManager.cpp \
+    source/database/tbl_prices.cpp \
+    source/core/priceUpload/yahooPrices.cpp \
+    source/models/pricesModel.cpp
 
 HEADERS += \
     include/application.h \
@@ -84,10 +89,17 @@ HEADERS += \
     include/models/menuModel.h \
     include/mainMenu.h \
     include/permissionSystem.h \
-    include/investmentManager.h \
     include/views/menuView.h \
     include/configSettings.h \
-    include/database/tbl_transactions.h
+    include/database/tbl_transactions.h \
+    include/transactionPages/investorContributions.h \
+    include/database/tbl_applicationData.h \
+    include/database/tbl_accounts.h \
+    include/transactionPages/priceManager.h \
+    include/database/tbl_commodities.h \
+    include/database/tbl_prices.h \
+    include/core/priceUpload/yahooPrices.h \
+    include/models/pricesModel.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
 LIBS += -L/usr/local/lib -lboost_system
@@ -95,4 +107,8 @@ LIBS += -L/usr/local/lib -lboost_filesystem
 LIBS += -L/usr/local/lib -lboost_thread
 LIBS += -L/usr/local/lib -lboost_program_options
 LIBS += -L../GCL -lGCL
+
+DISTFILES += \
+    menu.md \
+    developerNotes.md
 

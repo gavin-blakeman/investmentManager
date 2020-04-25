@@ -55,7 +55,7 @@ namespace transactions
   public:
     CTransactionPage(CApplication *parent) : Wt::WContainerWidget(), parent_(parent) {}
 
-    inline CApplication *parent() { return parent_; }
+    inline CApplication *application() { return parent_; }
 
     virtual void createPage() = 0;
   };

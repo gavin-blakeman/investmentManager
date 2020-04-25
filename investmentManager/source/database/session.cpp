@@ -91,7 +91,12 @@ namespace database
       mapClass<tbl_users>("im_users");
       users_ = std::make_unique<Wt::Auth::Dbo::UserDatabase<Wt::Auth::Dbo::AuthInfo<database::tbl_users>>>(*this);
 
+      mapClass<tbl_applicationData>("im_applicationData");
       mapClass<tbl_transactions>("im_transactions");
+
+      mapClass<tbl_commodities>("commodities");
+      //mapClass<tbl_prices>("prices");
+
     }
     catch (Wt::Dbo::Exception &e)
     {

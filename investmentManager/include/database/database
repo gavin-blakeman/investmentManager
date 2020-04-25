@@ -37,8 +37,10 @@
 
 #include "databaseTables.h"
 
+#include "include/database/tbl_applicationData.h"
 #include "include/database/tbl_users.h"
 #include "include/database/tbl_transactions.h"
-
+#include "include/database/tbl_commodities.h"
+#include "include/database/tbl_prices.h"
 
 #endif // DATABASE_H

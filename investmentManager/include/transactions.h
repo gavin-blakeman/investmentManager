@@ -50,7 +50,7 @@ namespace TC
   transaction_t const IP920   = 1920;
   transaction_t const IP930   = 1930;
 
-  transaction_t const IM000   = 11000;
+  transaction_t const IMD000   = 5000;
   transaction_t const IM010   = 11010;
   transaction_t const IM020   = 11020;
   transaction_t const IM100   = 11100;
@@ -74,11 +74,14 @@ namespace TC
   transaction_t const MT100   = 40100;
   transaction_t const MT900   = 40900;
 
-  transaction_t const GS000   = 50000;
+  transaction_t const MD000   = 5000;
+  transaction_t const MD100   =   5100;
+  transaction_t const MD110   =     5110;
+  transaction_t const MD120   =     5120;
+  transaction_t const MD200   = 5200;
 
   transaction_t const SM000   = 60000;
 
-  transaction_t const MD000   = 70000;
   transaction_t const UD000   =   70100;
   transaction_t const CD001   =   70200;
   transaction_t const PH000   =   70300;

@@ -58,6 +58,7 @@
 
 #include <include/database/database>
 #include "include/configSettings.h"
+#include "include/transactionPages/priceManager.h"
 #include "include/views/menuView.h"
 
 /// @brief Class constructor.
@@ -93,7 +94,7 @@ void CApplication::authenticationEvent()
     menuModel = std::make_shared<models::CMenuModel>(sqlSession_);
 
     //loadMenuData(sqlSession_);
-    //createTransactionMap();
+    createTransactionMap();
 
     createAfterLoginUI();
   }
@@ -197,8 +198,8 @@ void CApplication::createLoginUI()
 void CApplication::createTransactionMap()
 {
 
-//  transactionPages.emplace(TC::CD001, std::make_pair(std::unique_ptr<transactions::CTransactionPage>(),
-//                                                     transactions::CChemicalDataPage::createClass));
+  transactionPages.emplace(TC::MD110, std::make_pair(std::unique_ptr<transactions::CTransactionPage>(),
+                                                     transactions::CPriceManager::createClass));
 }
 
 /// @brief Creates the initial UI. This will be modified as required by the various transactions.
@@ -221,7 +222,7 @@ void CApplication::createUI()
 
 /// @brief Function called to empty the right container. This is done as required when the content of the right container needs to
 ///        change.
-/// @param[in] transactionID - The ID number of the transaction to start.
+/// @param[in] transactionID: The ID number of the transaction to start.
 /// @version 2020-04-19/GGB - Function created.
 
 void CApplication::emptyDataContainer()
@@ -230,7 +231,8 @@ void CApplication::emptyDataContainer()
 }
 
 /// @brief Callback function for menu transactions.
-/// @param[in] transactionID - ID of the transaction to start.
+/// @param[in] transactionID: ID of the transaction to start.
+/// @throws std::runtime_error
 /// @version 2020-04-19/GGB - Function created.
 
 void CApplication::menuCallback(transaction_t transactionID)

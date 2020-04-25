@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_users
-// SUBSYSTEM:           User Database Table definitions
+// FILE:                tbl_applicationData
+// SUBSYSTEM:           Table used for storing application related data.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -24,18 +24,20 @@
 //                      You should have received a copy of the GNU General Public License along with investmentManager.  If not,
 //                      see <http://www.gnu.org/licenses/>.
 //
-// OVERVIEW:
+// OVERVIEW:            The application data table is used for storing data used by the application to access the gnuCash tables.
+//                      This data is setup by using various application management functions found under the 'Application Data'
+//                      menu functions. The data stored in the table is used for connections within the database and it is not
+//                      prudent to store this in configuration files.
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-04-21/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef TBL_USERS_H
-#define TBL_USERS_H
+#ifndef TBL_APPLICATIONDATA_H
+#define TBL_APPLICATIONDATA_H
 
-  // Standard C++ library headers
+  // C++ standard library header files
 
-#include <stdint.h>
 #include <string>
 
   // Wt framework header files
@@ -48,28 +50,46 @@
 
 #include "include/database/databaseDefinitions.h"
 
+namespace Wt
+{
+  namespace Dbo
+  {
+    // Specialise the default traits for the table. This is required as the table does not have a version field and also
+    // does not use a surrogate ID field.
+
+    template<>
+    struct dbo_traits<database::tbl_applicationData> : public dbo_default_traits
+    {
+      typedef std::string IdType;
+
+      static const char *versionField() { return 0; }
+      static const char *surrogateIdField() { return 0; }
+      static IdType invalidId() { return std::string(); }
+    };
+  } // namespace Dbo
+} // namespace Wt
+
 namespace database
 {
 
-  class tbl_users
+  class tbl_applicationData
   {
   public:
-    std::string surname;
-    std::string firstName;
-    std::string equityAccount;    /// <GUID for the members equity account.
+    std::string token;
+    std::string value;
 
     template<class Action>
     void persist(Action & a)
     {
-      Wt::Dbo::field(a, surname, "Surname");
-      Wt::Dbo::field(a, firstName, "FirstName");
-      Wt::Dbo::field(a, equityAccount, "EquityAccount");
+      Wt::Dbo::id(a, token, "Token", 64);
+      Wt::Dbo::field(a, value, "Value");
     }
+
+
+    std::string const ACCOUNT_MEMBERSQUITY = "Account - Members Equity";
+    std::string const ACCOUNT_TAXPAYABLE = "Account - Tax Payable";
   };
 
 } // namespace database
 
-
-DBO_EXTERN_TEMPLATES(database::tbl_users)
-
-#endif // TBL_USERS_H
+#endif // TBL_APPLICATIONDATA_H
