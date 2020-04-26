@@ -61,6 +61,7 @@
 #include <include/database/database>
 #include "include/application.h"
 #include "include/permissionSystem.h"
+#include "include/dialogs/priceUpload.h"
 
 namespace transactions
 {
@@ -151,9 +152,10 @@ namespace transactions
       // Upload push button
 
     newButton = std::make_unique<Wt::WPushButton>("Upload");
-    newButton->setEnabled(false);
+    newButton->setEnabled(true);
     newButton->setToolTip("Upload commodity prices");
     pushButtonUpload = newButton.get();
+    pushButtonUpload->clicked().connect(this, &CPriceManager::pushButtonUploadClicked);
     toolbar->addButton(std::move(newButton));
 
     toolbar->setOrientation(Wt::Orientation::Horizontal);
@@ -177,12 +179,13 @@ namespace transactions
         comboBoxNamespace->addItem(ns);
       };
     };
-    comboBoxNamespace->sactivated().connect(this, &CPriceManager::comboBoxNamespaceChanged);
 
     layout->addWidget(std::make_unique<Wt::WLabel>("Commodity"), 3, 0);
 
     selectionBoxCommodity = layout->addWidget(std::make_unique<Wt::WSelectionBox>(), 4, 0);
     selectionBoxCommodity->setWidth(400);
+
+    comboBoxNamespace->sactivated().connect(this, &CPriceManager::comboBoxNamespaceChanged);
     selectionBoxCommodity->sactivated().connect(this, &CPriceManager::selectionBoxCommodityChanged);
 
     layout->addWidget(std::make_unique<Wt::WLabel>(), 5, 0);    // Spaceholder to allow row stretch
@@ -258,6 +261,15 @@ namespace transactions
     messageBox->show();
   }
 
+  /// @brief Opens the dialog to drag/drop files to upload.
+  /// @throws
+  /// @version 2020-04-25/GGB - Function created.
+
+  void CPriceManager::pushButtonUploadClicked()
+  {
+    addChild(std::make_unique<dialogs::CPriceUpload>(application()->session(), this));
+  }
+
   /// @brief Function called to refresh the data in the table view after a change.
   /// @throws
   /// @version 2020-04-22/GGB - Function created.
@@ -279,28 +291,31 @@ namespace transactions
     std::string commodityName(selectedItem.toUTF8());
     std::string commodityGUID;
 
-    commodityName = commodityName.substr(0, commodityName.find("-"));
-    boost::trim(commodityName);
-
-    try
+    if (!commodityName.empty())
     {
-      Wt::Dbo::Transaction transaction { application()->session() };
-      std::string szSQL = "SELECT commodities.guid " \
-                          "FROM commodities " \
-                          "WHERE commodities.mnemonic = '" + commodityName + "'";
 
-      commodityCollection = application()->session()
-                            .query<std::string>(szSQL);
+      commodityName = commodityName.substr(0, commodityName.find("-"));
+      boost::trim(commodityName);
 
-      commodityGUID = commodityCollection.front();
-    }
-    catch(Wt::Dbo::Exception &e)
-    {
-      std::cerr << e.what() << std::endl;
+      try
+      {
+        Wt::Dbo::Transaction transaction { application()->session() };
+        std::string szSQL = "SELECT commodities.guid " \
+                            "FROM commodities " \
+                            "WHERE commodities.mnemonic = '" + commodityName + "'";
+
+        commodityCollection = application()->session().query<std::string>(szSQL);
+
+        commodityGUID = commodityCollection.front();
+      }
+      catch(Wt::Dbo::Exception &e)
+      {
+        std::cerr << e.what() << std::endl;
+      };
+
+      queryModelPrices->changeCommodity(commodityGUID);
+      tableViewPrices->refresh();
     };
-
-    queryModelPrices->changeCommodity(commodityGUID);
-    tableViewPrices->refresh();
   }
 
 } // namespace transactions

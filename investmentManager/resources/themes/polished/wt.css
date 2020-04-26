@@ -1288,4 +1288,27 @@ table.x-grid3-row-table {
     z-index: 20000;
 }
 
+.upload-block {
+    width: 100%
+    height: 20px;
+    margin: 10px;
+    border: 1px solid black;
+    display: inline-block;
+}
+
+.upload-block.cancelled {
+    background-color: grey;
+}
+
+.upload-block.ready {
+    background-color: green;
+}
+
+.upload-block.invalid {
+    background-color: red;
+}
+
+.upload-block.failed {
+  background-color: red;
+}
 

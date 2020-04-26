@@ -75,7 +75,9 @@ SOURCES += \
     source/transactionPages/priceManager.cpp \
     source/database/tbl_prices.cpp \
     source/core/priceUpload/yahooPrices.cpp \
-    source/models/pricesModel.cpp
+    source/models/pricesModel.cpp \
+    source/dialogs/priceUpload.cpp \
+    source/core/priceUpload/priceUploadManager.cpp
 
 HEADERS += \
     include/application.h \
@@ -99,7 +101,9 @@ HEADERS += \
     include/database/tbl_commodities.h \
     include/database/tbl_prices.h \
     include/core/priceUpload/yahooPrices.h \
-    include/models/pricesModel.h
+    include/models/pricesModel.h \
+    include/dialogs/priceUpload.h \
+    include/core/priceUpload/priceUploadManager.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
 LIBS += -L/usr/local/lib -lboost_system

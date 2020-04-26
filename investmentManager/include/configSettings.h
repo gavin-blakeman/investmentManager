@@ -44,8 +44,15 @@
 #include <QSettings>
 #include <QString>
 
+
+
 std::string const APPLICATION_NAME  = "Investment Manager";
 QString const CONFIG_FILE       = "investmentManager.conf";
+
+  // Application Settings
+
+QString const APPLICATION_LOGLEVEL      ("Application/LogLevel");
+QString const APPLICATION_LOGFILE       ("Application/LogFile");
 
   // Database configuration
 
@@ -54,6 +61,10 @@ QString const DATABASE_DATABASENAME     ("Database/DatabaseName");
 QString const DATABASE_PORT             ("Database/Port");
 QString const DATABASE_USERNAME         ("Database/UserName");
 QString const DATABASE_PASSWORD         ("Database/Password");
+
+  // Price Settings
+
+QString const PRICES_MAXFILESUPLOAD     ("Prices/MaxFilesUpload");
 
 
 extern std::unique_ptr<QSettings> configurationSettings;

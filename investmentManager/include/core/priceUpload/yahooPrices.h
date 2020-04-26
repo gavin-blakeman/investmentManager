@@ -30,7 +30,31 @@
 //
 //**********************************************************************************************************************************
 
-#ifndef YAHOOPRICES_H
-#define YAHOOPRICES_H
+#ifndef CORE_PRICEUPLOAD_YAHOOPRICES_H
+#define CORE_PRICEUPLOAD_YAHOOPRICES_H
 
-#endif // YAHOOPRICES_H
+  // investmentManager header files
+
+#include "include/core/priceUpload/priceUploadManager.h".h"
+
+namespace core
+{
+  namespace priceUpload
+  {
+
+    class CYahooPriceUpload
+    {
+    private:
+      static bool pluginRegistered;
+
+    public:
+      static std::string nameFunction() { return "Yahoo"; }
+      static bool validateFunction(boost::filesystem::path const &);
+      static CPriceUploadManager::uploadFunctionReturn_t uploadFileFunction(boost::filesystem::path const &);
+
+    };
+
+  } // namespace priceUpload
+} // namespace core
+
+#endif // CORE_PRICEUPLOAD_YAHOOPRICES_H

@@ -34,6 +34,7 @@
 
 #include <exception>
 #include <memory>
+#include <string>
 
   // Wt++ library header files
 
@@ -41,6 +42,11 @@
 #include <Wt/Dbo/FixedSqlConnectionPool.h>
 #include <Wt/Dbo/SqlConnectionPool.h>
 #include <Wt/Dbo/backend/MySQL.h>
+
+  // Miscellaneous library header files
+
+#include <boost/algorithm/string.hpp>
+#include <GCL>
 
   // investmentManager header files.
 
@@ -91,6 +97,80 @@ std::unique_ptr<Wt::Dbo::SqlConnectionPool> createConnectionPool()
 
 int main(int argc, char **argv)
 {
+    // Setup the logger
+
+  GCL::logger::CSeverity logSeverity;
+  std::string logLevel = configurationSettings->value(APPLICATION_LOGLEVEL, QVariant("NORMAL")).toString().toStdString();
+  boost::to_upper(logLevel);
+
+  if (logLevel == "NORMAL")
+  {
+    logSeverity.fCritical = true;
+    logSeverity.fError = true;
+    logSeverity.fWarning = true;
+    logSeverity.fNotice = false;
+    logSeverity.fInfo = false;
+    logSeverity.fDebug = false;
+    logSeverity.fTrace = false;
+  }
+  else if (logLevel == "VERBOSE")
+  {
+    logSeverity.fCritical = true;
+    logSeverity.fError = true;
+    logSeverity.fWarning = true;
+    logSeverity.fNotice = true;
+    logSeverity.fInfo = true;
+    logSeverity.fDebug = false;
+    logSeverity.fTrace = false;
+  }
+  else if (logLevel == "DEBUG")
+  {
+    logSeverity.fCritical = true;
+    logSeverity.fError = true;
+    logSeverity.fWarning = true;
+    logSeverity.fNotice = true;
+    logSeverity.fInfo = true;
+    logSeverity.fDebug = true;
+    logSeverity.fTrace = false;
+  }
+  else if (logLevel == "TRACE")
+  {
+    logSeverity.fCritical = true;
+    logSeverity.fError = true;
+    logSeverity.fWarning = true;
+    logSeverity.fNotice = true;
+    logSeverity.fInfo = true;
+    logSeverity.fDebug = true;
+    logSeverity.fTrace = true;
+  };
+
+  std::string logFile = configurationSettings->value(APPLICATION_LOGFILE, QVariant(QString(""))).toString().toStdString();
+
+  if (!boost::filesystem::is_directory(logFile))
+  {
+    logFile = "";
+  };
+
+  GCL::logger::PLoggerSink fileLogger(new GCL::logger::CFileSink(logFile, "investmentManager"));
+  std::dynamic_pointer_cast<GCL::logger::CFileSink>(fileLogger)->setRotationPolicyUse(10);
+  fileLogger->setLogLevel(logSeverity);
+
+  try
+  {
+    std::dynamic_pointer_cast<GCL::logger::CFileSink>(fileLogger)->openLogFile();
+  }
+  catch(...)
+  {
+    std::clog << "Error while creating logfile. Does the directory exist?" << std::endl;
+  };
+
+  GCL::logger::defaultLogger().addSink(fileLogger);
+
+  logSeverity.fTrace = false;
+  GCL::logger::PLoggerSink coutLogger(new GCL::logger::CStreamSink(std::cout));
+  coutLogger->setLogLevel(logSeverity);
+  GCL::logger::defaultLogger().addSink(coutLogger);
+
   try
   {
     Wt::WServer server(argc, argv, WTHTTP_CONFIGURATION);

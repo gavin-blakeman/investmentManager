@@ -64,7 +64,11 @@ namespace models
 
   void CPricesModel::changeCommodity(std::string const &guid)
   {
-    if (guid != commodityGUID)
+    if (guid.empty())
+    {
+      clear();
+    }
+    else if (guid != commodityGUID)
     {
         // GUID is different. Flush existing data and notify the table.
 
