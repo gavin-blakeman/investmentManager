@@ -52,6 +52,7 @@
   // Miscellaneous library header files
 
 #include <boost/lexical_cast.hpp>
+#include <GCL>
 
   // investmentManager Header files.
 
@@ -77,33 +78,25 @@ namespace dialogs
   }
 
   /// @brief Function called when the dialog is accepted.
+  /// @param[in] dialogCode: The value for the dialog code.
   /// @version 2020-04-25/GGB - Function created.
 
   void CPriceUpload::dialogFinished(Wt::DialogCode dialogCode)
   {
-//    if (dialogCode == Wt::DialogCode::Accepted)
-//    {
-//      try
-//      {
-//        std::uint32_t usageValue = boost::lexical_cast<std::uint32_t>(lineEditInterval->text());
+    if (dialogCode == Wt::DialogCode::Accepted)
+    {
+      std::vector<Wt::WFileDropWidget::File*> uploads = fileDropWidget->uploads();
 
-//        // Save the data.
+      for (auto file: uploads)
+      {
+        boost::filesystem::path filename = file->uploadedFile().clientFileName();
+        boost::filesystem::path fn = filename.stem();
 
-//        database::tbl_maintenanceSchedule::insertRecord(application_->session(), maintenanceStrategyID_,
-//                                                        lineEditScheduleDescription->valueText(),
-//                                                        lineEditScheduleAbbreviation->valueText(),
-//                                                        textAreaScheduleDetails->valueText(),
-//                                                        static_cast<std::int32_t>(usageValue));
-//        dynamic_cast<widgets::CWidgetMaintenanceSchedule *>(parent_)->refresh();
-//      }
-//      catch(boost::bad_lexical_cast const &e)
-//      {
-//        std::cerr << e.what() << std::endl;
-//      }
+        database::priceUpload(session, filename.string(), file->uploadedFile().spoolFileName());
+      };
+    };
 
-//    };
-
-//    removeFromParent();
+    removeFromParent();
   }
 
   /// @brief Creates the UI for the dialog.
@@ -145,12 +138,12 @@ namespace dialogs
 
   void CPriceUpload::fileDropWidgetDrop(std::vector<Wt::WFileDropWidget::File *> files)
   {
-    std::uint16_t const maxFiles = configurationSettings->value(PRICES_MAXFILESUPLOAD, 5).toUInt();
+    std::optional<std::uint16_t> const maxFiles = configurationReader.tagValueUInt16(PRICES_MAXFILESUPLOAD);
     std::uint16_t fileCount = fileDropWidget->uploads().size() - files.size();
 
     for (std::uint_fast16_t index = 0; index < files.size(); ++index)
     {
-      if (fileCount + index >= maxFiles)
+      if (fileCount + index >= *maxFiles)
       {
         fileDropWidget->cancelUpload(files[index]);
       }
@@ -212,6 +205,8 @@ namespace dialogs
         {
           fileDropWidget->widget(index)->removeStyleClass("spinner");
           fileDropWidget->widget(index)->addStyleClass("ready");
+
+          pushButtonUpload->setEnabled(true);
         }
         else
         {

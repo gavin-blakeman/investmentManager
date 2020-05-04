@@ -33,7 +33,7 @@
 TARGET = investmentManager.wt
 TEMPLATE = app
 
-QT += core
+QT += core sql
 QT -= gui
 
 CONFIG += console
@@ -77,7 +77,11 @@ SOURCES += \
     source/core/priceUpload/yahooPrices.cpp \
     source/models/pricesModel.cpp \
     source/dialogs/priceUpload.cpp \
-    source/core/priceUpload/priceUploadManager.cpp
+    source/core/priceUpload/priceUploadManager.cpp \
+    source/database/tbl_commodities.cpp \
+    source/database/tbl_shareRegister.cpp \
+    source/database/tbl_accounts.cpp \
+    source/database/tbl_books.cpp
 
 HEADERS += \
     include/application.h \
@@ -103,7 +107,10 @@ HEADERS += \
     include/core/priceUpload/yahooPrices.h \
     include/models/pricesModel.h \
     include/dialogs/priceUpload.h \
-    include/core/priceUpload/priceUploadManager.h
+    include/core/priceUpload/priceUploadManager.h \
+    include/core/shareFunctions/shareFunctions.h \
+    include/database/tbl_shareRegister.h \
+    include/database/tbl_books.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
 LIBS += -L/usr/local/lib -lboost_system

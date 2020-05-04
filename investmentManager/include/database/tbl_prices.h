@@ -42,18 +42,21 @@
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/Types.h>
+#include <Wt/Dbo/Session.h>
 #include <Wt/WAbstractTableModel.h>
 #include <Wt/WGlobal.h>
 #include <Wt/WDate.h>
 
   // Miscellaneous library header files
 
+#include <boost/filesystem.hpp>
 #include <MCL>
 
   // investmentManager header files
 
 #include "include/database/databaseDefinitions.h"
 #include "include/database/databaseTables.h"
+#include "include/core/priceUpload/priceUploadManager.h"
 
 namespace Wt
 {
@@ -114,6 +117,7 @@ namespace database
   std::string const TYPE_TRANSACTION = "transaction";
   std::string const TYPE_LAST = "last";
 
+  void priceUpload(Wt::Dbo::Session &, std::string const &, boost::filesystem::path const &);
 
 
 } // namespace database

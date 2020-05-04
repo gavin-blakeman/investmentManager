@@ -34,6 +34,7 @@
 
 #include <exception>
 #include <memory>
+#include <optional>
 #include <string>
 
   // Wt++ library header files
@@ -46,6 +47,7 @@
   // Miscellaneous library header files
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <GCL>
 
   // investmentManager header files.
@@ -53,6 +55,42 @@
 #include "include/application.h"
 #include "include/configSettings.h"
 #include "include/database/session.h"
+
+  // Software version information
+
+int const MAJORVERSION	= 2020;       // Major version (year)
+int const MINORVERSION	= 9;          // Minor version (month)
+std::uint16_t const BUILDNUMBER = 0x0000;
+std::string const BUILDDATE(__DATE__);
+
+/// @brief Returns the copyright string.
+/// @returns The copyright string as a std::string.
+/// @version 2020-05-04/GGB - Function created.
+
+std::string getCopyrightString()
+{
+  return std::move("Copyright (C) 2020 - Gavin Blakeman. All rights reserved.");
+}
+
+/// @brief Function to return the release string.
+/// @returns The release string as a std::string
+/// @throws None.
+/// @version 2020-05-04/GGB - Function created.
+
+std::string getReleaseString()
+{
+  return std::move(boost::str(boost::format("%04i.%02i.%04X") % MAJORVERSION % MINORVERSION % BUILDNUMBER));
+}
+
+/// @brief Function to return the build date.
+/// @returns The build date as a string.
+/// @throws None.
+/// @version 2020-05-04/GGB - Function created.
+
+std::string getReleaseDate()
+{
+  return BUILDDATE;
+}
 
 /// @brief Creates a connection pool for further use. Has 10 connections in the connection pool.
 /// @details The configuration required to connect to the database is loaded from the configuration file. See the documentation
@@ -63,26 +101,28 @@
 
 std::unique_ptr<Wt::Dbo::SqlConnectionPool> createConnectionPool()
 {
-  std::string hostAddress = configurationSettings->value(DATABASE_HOSTADDRESS).toString().toStdString();
-  std::uint16_t portAddress = configurationSettings->value(DATABASE_PORT).toUInt();
-  std::string databaseName = configurationSettings->value(DATABASE_DATABASENAME).toString().toStdString();
-  std::string userName = configurationSettings->value(DATABASE_USERNAME).toString().toStdString();
-  std::string password = configurationSettings->value(DATABASE_PASSWORD).toString().toStdString();
+  std::optional<std::string> hostAddress = configurationReader.tagValueString(DATABASE_HOSTADDRESS);
+  std::optional<std::uint16_t> portAddress = configurationReader.tagValueUInt16(DATABASE_PORT);
+  std::optional<std::string> databaseName = configurationReader.tagValueString(DATABASE_DATABASENAME);
+  std::optional<std::string> userName = configurationReader.tagValueString(DATABASE_USERNAME);
+  std::optional<std::string> password = configurationReader.tagValueString(DATABASE_PASSWORD);
 
     // Sense check all the configuration settings and exit if problematic.
 
-  if (hostAddress.empty() || databaseName.empty() || userName.empty() || password.empty())
+  if (hostAddress && databaseName && userName && password)
+  {
+    auto connection = std::make_unique<Wt::Dbo::backend::MySQL>(*databaseName,
+                                                                *userName,
+                                                                *password,
+                                                                *hostAddress,
+                                                                *portAddress);
+    connection->setProperty("show-queries", "true");
+    return std::make_unique<Wt::Dbo::FixedSqlConnectionPool>(std::move(connection), 10);
+  }
+  else
   {
     throw std::runtime_error("Incorrect database configuration details in configuration file.");
   };
-
-  auto connection = std::make_unique<Wt::Dbo::backend::MySQL>(databaseName,
-                                                              userName,
-                                                              password,
-                                                              hostAddress,
-                                                              portAddress);
-  connection->setProperty("show-queries", "true");
-  return std::make_unique<Wt::Dbo::FixedSqlConnectionPool>(std::move(connection), 10);
 }
 
 
@@ -100,20 +140,26 @@ int main(int argc, char **argv)
     // Setup the logger
 
   GCL::logger::CSeverity logSeverity;
-  std::string logLevel = configurationSettings->value(APPLICATION_LOGLEVEL, QVariant("NORMAL")).toString().toStdString();
-  boost::to_upper(logLevel);
+  std::optional<std::string> logLevel = configurationReader.tagValueString(APPLICATION_LOGLEVEL);
 
-  if (logLevel == "NORMAL")
+  if (!logLevel)
+  {
+    logLevel = "NORMAL";
+  };
+
+  boost::to_upper(*logLevel);
+
+  if (*logLevel == "NORMAL")
   {
     logSeverity.fCritical = true;
     logSeverity.fError = true;
     logSeverity.fWarning = true;
-    logSeverity.fNotice = false;
+    logSeverity.fNotice = true;
     logSeverity.fInfo = false;
     logSeverity.fDebug = false;
     logSeverity.fTrace = false;
   }
-  else if (logLevel == "VERBOSE")
+  else if (*logLevel == "VERBOSE")
   {
     logSeverity.fCritical = true;
     logSeverity.fError = true;
@@ -123,7 +169,7 @@ int main(int argc, char **argv)
     logSeverity.fDebug = false;
     logSeverity.fTrace = false;
   }
-  else if (logLevel == "DEBUG")
+  else if (*logLevel == "DEBUG")
   {
     logSeverity.fCritical = true;
     logSeverity.fError = true;
@@ -133,7 +179,7 @@ int main(int argc, char **argv)
     logSeverity.fDebug = true;
     logSeverity.fTrace = false;
   }
-  else if (logLevel == "TRACE")
+  else if (*logLevel == "TRACE")
   {
     logSeverity.fCritical = true;
     logSeverity.fError = true;
@@ -144,14 +190,21 @@ int main(int argc, char **argv)
     logSeverity.fTrace = true;
   };
 
-  std::string logFile = configurationSettings->value(APPLICATION_LOGFILE, QVariant(QString(""))).toString().toStdString();
+  std::optional<std::string> logFile = configurationReader.tagValueString(APPLICATION_LOGFILE);
 
-  if (!boost::filesystem::is_directory(logFile))
+  if (logFile)
+  {
+    if (!boost::filesystem::is_directory(*logFile))
+    {
+      logFile = "";
+    };
+  }
+  else
   {
     logFile = "";
   };
 
-  GCL::logger::PLoggerSink fileLogger(new GCL::logger::CFileSink(logFile, "investmentManager"));
+  GCL::logger::PLoggerSink fileLogger(new GCL::logger::CFileSink(*logFile, "investmentManager"));
   std::dynamic_pointer_cast<GCL::logger::CFileSink>(fileLogger)->setRotationPolicyUse(10);
   fileLogger->setLogLevel(logSeverity);
 
@@ -170,6 +223,14 @@ int main(int argc, char **argv)
   GCL::logger::PLoggerSink coutLogger(new GCL::logger::CStreamSink(std::cout));
   coutLogger->setLogLevel(logSeverity);
   GCL::logger::defaultLogger().addSink(coutLogger);
+
+  NOTICEMESSAGE("Application Started.");
+  NOTICEMESSAGE("Release Number: " + getReleaseString() + ". Release Date: " + getReleaseDate() + ".");
+  NOTICEMESSAGE(getCopyrightString());
+  DEBUGMESSAGE("int size: " + boost::lexical_cast<std::string>(sizeof(int)) + " bytes. Maximum Value: " + boost::lexical_cast<std::string>(std::numeric_limits<int>::max()) + ".");
+  DEBUGMESSAGE("long size: " + boost::lexical_cast<std::string>(sizeof(long)) + " bytes. Maximum Value: " + boost::lexical_cast<std::string>(std::numeric_limits<long>::max()) + ".");
+  DEBUGMESSAGE("float size: " + boost::lexical_cast<std::string>(sizeof(float)) + " bytes.");
+  DEBUGMESSAGE("double size: " + boost::lexical_cast<std::string>(sizeof(double)) + " bytes.");
 
   try
   {

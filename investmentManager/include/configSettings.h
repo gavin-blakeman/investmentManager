@@ -39,35 +39,32 @@
 #include <memory>
 #include <string>
 
-  // Qt framework header files
+  // Miscellaneous library header files.
 
-#include <QSettings>
-#include <QString>
+#include <GCL>
 
-
-
-std::string const APPLICATION_NAME  = "Investment Manager";
-QString const CONFIG_FILE       = "investmentManager.conf";
+std::string const APPLICATION_NAME  =       ("Investment Manager");
+std::string const CONFIG_FILE               ("investmentManager.conf");
 
   // Application Settings
 
-QString const APPLICATION_LOGLEVEL      ("Application/LogLevel");
-QString const APPLICATION_LOGFILE       ("Application/LogFile");
+std::string const APPLICATION_LOGLEVEL      ("Application/LogLevel");
+std::string const APPLICATION_LOGFILE       ("Application/LogFile");
 
   // Database configuration
 
-QString const DATABASE_HOSTADDRESS      ("Database/HostAddress");
-QString const DATABASE_DATABASENAME     ("Database/DatabaseName");
-QString const DATABASE_PORT             ("Database/Port");
-QString const DATABASE_USERNAME         ("Database/UserName");
-QString const DATABASE_PASSWORD         ("Database/Password");
+std::string const DATABASE_DBMSTYPE         ("Database/DBMSType");
+std::string const DATABASE_HOSTADDRESS      ("Database/HostAddress");
+std::string const DATABASE_DATABASENAME     ("Database/DatabaseName");
+std::string const DATABASE_PORT             ("Database/Port");
+std::string const DATABASE_USERNAME         ("Database/UserName");
+std::string const DATABASE_PASSWORD         ("Database/Password");
 
   // Price Settings
 
-QString const PRICES_MAXFILESUPLOAD     ("Prices/MaxFilesUpload");
+std::string const PRICES_MAXFILESUPLOAD     ("Prices/MaxFilesUpload");
 
 
-extern std::unique_ptr<QSettings> configurationSettings;
-
+extern GCL::CReaderSections configurationReader;
 
 #endif // CONFIGSETTINGS_H

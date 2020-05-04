@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_prices.cpp
-// SUBSYSTEM:           gnuCash prices table
+// FILE:                tbl_books.h
+// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,49 +26,30 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-04/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_prices.h"
+#ifndef TBL_BOOKS_H
+#define TBL_BOOKS_H
 
-  // Miscellaneous library header files
+  // Standard C++ library header files
 
-#include <GCL>
+#include <string>
 
-  // investmentManager header files
+  // Wt++ framework header files
 
-#include "include/core/priceUpload/priceUploadManager.h"
-#include "include/database/tbl_commodities.h"
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/Session.h>
 
 namespace database
 {
-  /// @brief Uploads prices from the specified file. The file parameters are passed to the function.
-  /// @param[in] session: The database session to use.
-  /// @param[in] commodityCode: The code for the commodity to upload.
-  /// @param[in] uploadFilename: The path to the upload location.
-  /// @throws
-  /// @returns
-  /// @version 2020-05-02/GGB - Function created.
-
-  void priceUpload(Wt::Dbo::Session &session, std::string const &commodityCode, boost::filesystem::path const &uploadFilename)
+  class tbl_books
   {
-    core::priceUpload::CPriceUploadManager::parseFunctionReturn_t parsedFile;
-
-    parsedFile = core::priceUpload::CPriceUploadManager::parseFile(uploadFilename);
-
-    if (parsedFile)
-    {
-        // The parsedFile variable nows has a number of values stored. This can now be uploaded to the relevant commodity.
-
-      std::optional<std::string> GUID = commodityGUID(session, commodityCode);
-      GCL::sqlwriter::CSQLWriter sqlWriter;
-
-      sqlWriter.insertInto("prices");
-
-
-
-    }
-  }
+  public:
+    static std::string rootAccountGUID(Wt::Dbo::Session &);
+  };
 
 } // namespace database
+
+#endif // TBL_BOOKS_H

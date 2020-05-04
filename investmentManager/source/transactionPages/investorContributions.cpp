@@ -35,5 +35,23 @@
 namespace transactions
 {
 
+  /// @brief Constructor for the investor contributions page.
+  /// @param[in] parent: The application that 'owns' this instance.
+  /// @throws
+  /// @version 2020-05-02/GGB - Function created.
+
+  CInvestorContributions::CInvestorContributions(CApplication *parent) : CTransactionPage(parent)
+  {
+  }
+
+  /// @brief Creates the investor contribution page.
+  /// @throws
+  /// @version 2020-05-02/GGB - Function created.
+
+  void CInvestorContributions::createPage()
+  {
+
+  }
+
 } // namespace transactions
 

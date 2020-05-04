@@ -286,10 +286,7 @@ namespace transactions
 
   void CPriceManager::selectionBoxCommodityChanged(Wt::WString selectedItem)
   {
-    Wt::Dbo::collection<std::string> commodityCollection;
-
     std::string commodityName(selectedItem.toUTF8());
-    std::string commodityGUID;
 
     if (!commodityName.empty())
     {
@@ -297,23 +294,7 @@ namespace transactions
       commodityName = commodityName.substr(0, commodityName.find("-"));
       boost::trim(commodityName);
 
-      try
-      {
-        Wt::Dbo::Transaction transaction { application()->session() };
-        std::string szSQL = "SELECT commodities.guid " \
-                            "FROM commodities " \
-                            "WHERE commodities.mnemonic = '" + commodityName + "'";
-
-        commodityCollection = application()->session().query<std::string>(szSQL);
-
-        commodityGUID = commodityCollection.front();
-      }
-      catch(Wt::Dbo::Exception &e)
-      {
-        std::cerr << e.what() << std::endl;
-      };
-
-      queryModelPrices->changeCommodity(commodityGUID);
+      queryModelPrices->changeCommodity(*database::commodityGUID(application()->session(), commodityName));
       tableViewPrices->refresh();
     };
   }

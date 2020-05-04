@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_prices.cpp
-// SUBSYSTEM:           gnuCash prices table
+// FILE:                tbl_commodities
+// SUBSYSTEM:           gnuCash Commodities table
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -24,51 +24,50 @@
 //                      You should have received a copy of the GNU General Public License along with investmentManager.  If not,
 //                      see <http://www.gnu.org/licenses/>.
 //
-// OVERVIEW:
+// OVERVIEW:            The commodities table is organised as a namespace:mnemonic pair. The namespace does not sit in a different
+//                      table, so the data is stored multiple times in the table.
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-02/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_prices.h"
+#include "include/database/tbl_commodities.h"
 
-  // Miscellaneous library header files
+  // Miscellaneous library header files.
 
 #include <GCL>
 
-  // investmentManager header files
-
-#include "include/core/priceUpload/priceUploadManager.h"
-#include "include/database/tbl_commodities.h"
-
 namespace database
 {
-  /// @brief Uploads prices from the specified file. The file parameters are passed to the function.
-  /// @param[in] session: The database session to use.
-  /// @param[in] commodityCode: The code for the commodity to upload.
-  /// @param[in] uploadFilename: The path to the upload location.
+  /// @brief Finds the GUID for the specified commodity. The specified commodity can be a share (stock) or a currency.
+  /// @param[in] mnemonic: The mnemonic of the share to find.
+  /// @returns A std::optional<std::string> containing the commodity GUID if found.
   /// @throws
-  /// @returns
   /// @version 2020-05-02/GGB - Function created.
 
-  void priceUpload(Wt::Dbo::Session &session, std::string const &commodityCode, boost::filesystem::path const &uploadFilename)
+  std::optional<std::string> commodityGUID(Wt::Dbo::Session &session, std::string const &mnemonic)
   {
-    core::priceUpload::CPriceUploadManager::parseFunctionReturn_t parsedFile;
+    std::optional<std::string> returnValue;
 
-    parsedFile = core::priceUpload::CPriceUploadManager::parseFile(uploadFilename);
-
-    if (parsedFile)
+    try
     {
-        // The parsedFile variable nows has a number of values stored. This can now be uploaded to the relevant commodity.
+      Wt::Dbo::Transaction transaction { session };
 
-      std::optional<std::string> GUID = commodityGUID(session, commodityCode);
       GCL::sqlwriter::CSQLWriter sqlWriter;
 
-      sqlWriter.insertInto("prices");
+      sqlWriter.select({"commodities.guid"}).from("commodities")
+          .where({GCL::sqlwriter::parameterTriple("commodities.mnemonic", "=", mnemonic)});
 
-
+      returnValue = session.query<std::string>(sqlWriter.string());
 
     }
+    catch(Wt::Dbo::Exception &e)
+    {
+      ERRORMESSAGE(e.what());
+    };
+
+    return returnValue;
   }
+
 
 } // namespace database

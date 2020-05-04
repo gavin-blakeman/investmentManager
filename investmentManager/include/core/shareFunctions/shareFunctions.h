@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_prices.cpp
-// SUBSYSTEM:           gnuCash prices table
+// FILE:                /core/shareFunctions/shareFunctions.h
+// SUBSYSTEM:           Functions for managing fund shares
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core::shareFunctions
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,49 +26,19 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-02/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_prices.h"
+#ifndef SHAREFUNCTIONS_H
+#define SHAREFUNCTIONS_H
 
-  // Miscellaneous library header files
-
-#include <GCL>
-
-  // investmentManager header files
-
-#include "include/core/priceUpload/priceUploadManager.h"
-#include "include/database/tbl_commodities.h"
-
-namespace database
+namespace core
 {
-  /// @brief Uploads prices from the specified file. The file parameters are passed to the function.
-  /// @param[in] session: The database session to use.
-  /// @param[in] commodityCode: The code for the commodity to upload.
-  /// @param[in] uploadFilename: The path to the upload location.
-  /// @throws
-  /// @returns
-  /// @version 2020-05-02/GGB - Function created.
-
-  void priceUpload(Wt::Dbo::Session &session, std::string const &commodityCode, boost::filesystem::path const &uploadFilename)
+  namespace shareFunctions
   {
-    core::priceUpload::CPriceUploadManager::parseFunctionReturn_t parsedFile;
 
-    parsedFile = core::priceUpload::CPriceUploadManager::parseFile(uploadFilename);
-
-    if (parsedFile)
-    {
-        // The parsedFile variable nows has a number of values stored. This can now be uploaded to the relevant commodity.
-
-      std::optional<std::string> GUID = commodityGUID(session, commodityCode);
-      GCL::sqlwriter::CSQLWriter sqlWriter;
-
-      sqlWriter.insertInto("prices");
-
-
-
-    }
   }
+}
 
-} // namespace database
+#endif // SHAREFUNCTIONS_H

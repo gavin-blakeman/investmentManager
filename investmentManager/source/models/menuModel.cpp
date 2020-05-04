@@ -72,12 +72,12 @@ namespace models
 
   void CMenuModel::populateMenu(Wt::Dbo::Session &sqlSession)
   {
-    using hierarchy_t = SCL::hierarchy<transaction_t, std::pair<std::string, std::string>, 0>;
+    using hierarchy_t = SCL::hierarchy<transaction_t, std::pair<std::string, std::string>>;
 
       /* A map is used rather than a vector, as a vector needs the [] operator to refer to already constructed objects.
        * the map [] creates an object as required. */
 
-    hierarchy_t menuHierarchy;
+    hierarchy_t menuHierarchy(0);
     std::map<SCL::hierarchy<std::int32_t, std::string, 0>::size_type, Wt::WStandardItem *> levelPointers;
     hierarchy_t::iterator iterator;
     hierarchy_t::iterator::size_type level;

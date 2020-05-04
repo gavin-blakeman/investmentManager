@@ -33,8 +33,80 @@
 #ifndef TBL_ACCOUNTS_H
 #define TBL_ACCOUNTS_H
 
+  // Standard C++ library header files
+
+#include <cstdint>
+#include <string>
+#include <tuple>
+#include <utility>
+
+  // Wt++ Framework header files
+
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/Session.h>
+
+  // Miscellaneous library header files
+
+#include <SCL>
+
+/* The accounts table has the following default layout;
+ *  > guid - varchar(32)
+ *  > name - varchar(2048)
+ *  > account_type  - varchar(2048)
+ *  > commodity_guid - varchar(32)
+ *  > commodity_scu - int(11)
+ *  > non_std_scu - int(11)
+ *  > parent_guid - varchar(32)
+ *  > code - varchar(2048)
+ *  > description - varchar(2048)
+ *  > hidden - int(11)
+ *  > placeholder - int(11)
+ *
+ *  Values used for various columns are:
+ *  > account_type
+ *    >> ASSET
+ *    >> INCOME
+ *    >> EXPENSE
+ *    >> EQUITY
+ *    >> MUTUAL
+ *    >> STOCK
+ *    >> BANK
+ *    >> ROOT
+ *    >> LIABILITY
+ *  > commodity_scu - Also referred to as smallest fraction. This is picked up from the commodity table
+ *  > non_std_scu - Smallest fraction. This value is used if the smallest fraction from the commodity::fraction is overridden.
+ */
+
 namespace database
 {
+  class tbl_accounts
+  {
+  public:
+    enum EAccountType
+    {
+      NONE,
+      ASSET,
+      INCOME,
+      EXPENSE,
+      EQUITY,
+      MUTUAL,
+      STOCK,
+      BANK,
+      ROOT,
+      LIABILITY,
+    };
+
+    using accountHierarchy_t = SCL::hierarchy<std::string,                  ///< account.guid
+                                              std::tuple<std::string,       ///< account.name
+                                                         std::string,       ///< account.description
+                                                         std::string,       ///< account.commodity_guid
+                                                         std::int32_t,      ///< scu
+                                                         double>>;          ///< value
+
+    static void buildHierarchy(Wt::Dbo::Session &, EAccountType, accountHierarchy_t &);
+
+  };  // class tbl_accounts
+
 }   // namespace database
 
 #endif // TBL_ACCOUNTS_H

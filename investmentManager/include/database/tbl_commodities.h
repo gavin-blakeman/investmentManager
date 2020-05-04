@@ -37,12 +37,14 @@
   // C++ standard library header files
 
 #include <cstdint>
+#include <optional>
 #include <string>
 
   // Wt++ framework header files
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/Types.h>
+#include <Wt/Dbo/Session.h>
 #include <Wt/WGlobal.h>
 
   // investmentManager header files
@@ -98,7 +100,9 @@ namespace database
       Wt::Dbo::field(a, fullname, "fullname");
     }
 
-  };
+  };  // class tbl_commoditites
+
+  std::optional<std::string> commodityGUID(Wt::Dbo::Session &, std::string const &);
 
 } // namespace database
 

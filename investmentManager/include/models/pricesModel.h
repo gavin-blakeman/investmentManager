@@ -81,7 +81,7 @@ namespace models
 
     void clear();
 
-    virtual int columnCount(Wt::WModelIndex const &parent = Wt::WModelIndex()) const { return 4;}
+    virtual int columnCount(Wt::WModelIndex const & = Wt::WModelIndex()) const { return 4;}
     virtual int rowCount(Wt::WModelIndex const &parent = Wt::WModelIndex()) const;
 
     virtual std::any data(Wt::WModelIndex const &index, Wt::ItemDataRole role = Wt::ItemDataRole::Display) const override;

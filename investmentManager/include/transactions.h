@@ -39,27 +39,20 @@ typedef std::int32_t transaction_t;
 
 namespace TC
 {
-  transaction_t const IP000   = 1000;
-  transaction_t const IP050   = 1050;
-  transaction_t const IP100   = 1100;
-  transaction_t const IP200   = 1200;
-  transaction_t const IP210   = 1210;
-  transaction_t const IP290   = 1290;
-  transaction_t const IP900   = 1900;
-  transaction_t const IP910   = 1910;
-  transaction_t const IP920   = 1920;
-  transaction_t const IP930   = 1930;
+  transaction_t const AD000   = 1000;
+  transaction_t const AD100   = 1100;
+  transaction_t const AD110   = 1110;
+  transaction_t const AD120   = 1120;
+  transaction_t const AD130   = 1130;
 
-  transaction_t const IMD000   = 5000;
-  transaction_t const IM010   = 11010;
-  transaction_t const IM020   = 11020;
-  transaction_t const IM100   = 11100;
-  transaction_t const IM800   = 11800;
-  transaction_t const IM900   = 11900;
-  transaction_t const IM910   = 11910;
-  transaction_t const IM920   = 11920;
-  transaction_t const IM930   = 11930;
-  transaction_t const IM940   = 11940;
+  transaction_t const IM000   = 3000;
+  transaction_t const IM100   = 3100;
+  transaction_t const IM200   = 3200;
+  transaction_t const IM300   = 3300;
+  transaction_t const IM400   = 3400;
+  transaction_t const IM500   = 3500;
+  transaction_t const IM510   = 3510;
+  transaction_t const IM520   = 3520;
 
   transaction_t const MS000   = 20000;
   transaction_t const MS001   = 20100;
@@ -99,16 +92,6 @@ namespace TC
   transaction_t const AS004   =     70540;
   transaction_t const OT000   =   70600;
   transaction_t const OT010   =     70610;
-
-  transaction_t const AD000   = 80000;
-  transaction_t const AD010   = 80010;
-  transaction_t const AD020   = 80020;
-  transaction_t const AD030   = 80030;
-  transaction_t const AD040   = 80040;
-  transaction_t const AD050   = 80050;
-  transaction_t const AD100   =   80100;
-  transaction_t const AD110   =     80110;
-  transaction_t const AD120   =     80120;
 }
 
 #endif // TRANSACTIONS_H

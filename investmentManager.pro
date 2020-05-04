@@ -4,7 +4,7 @@ CONFIG += ordered
 SUBDIRS += "GCL"
 SUBDIRS += "MCL"
 #SUBDIRS += "WtExtensions"
-#SUBDIRS += "PCL"
+#SUBDIRS += "QCL"
 SUBDIRS += "SCL"
 SUBDIRS += "investmentManager"
 

@@ -33,4 +33,4 @@
 
 #include "include/configSettings.h"
 
-std::unique_ptr<QSettings> configurationSettings = std::make_unique<QSettings>(CONFIG_FILE, QSettings::Format::NativeFormat);
+GCL::CReaderSections configurationReader(CONFIG_FILE);

@@ -6,7 +6,7 @@
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core::priceUpload
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -91,6 +91,8 @@ namespace core
           returnValue = true;
           INFOMESSAGE(boost::str(boost::format("File %s validated as Yahoo prices file.") % filename));
         };
+
+        ifs.close();
       };
 
       return returnValue;
@@ -102,7 +104,7 @@ namespace core
     /// @throws
     /// @version 2020-04-26/GGB - Function created.
 
-    CPriceUploadManager::uploadFunctionReturn_t CYahooPriceUpload::uploadFileFunction(boost::filesystem::path const &filename)
+    CPriceUploadManager::parseFunctionReturn_t CYahooPriceUpload::uploadFileFunction(boost::filesystem::path const &filename)
     {
       CPriceUploadManager::pricesVector_t returnVector;
       std::optional<CPriceUploadManager::pricesVector_t> returnValue;
@@ -202,6 +204,8 @@ namespace core
             };
           };
         };  // while statement
+
+        ifs.close();
 
         returnValue = std::move(returnVector);
       }

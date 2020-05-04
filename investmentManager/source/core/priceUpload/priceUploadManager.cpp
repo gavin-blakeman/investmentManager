@@ -6,7 +6,7 @@
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core::priceUpload
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -98,6 +98,41 @@ namespace core
       }
     }
 
+    /// @brief Attempts to parse the file. Each of the plugins are tried in turn until one manages to validate the file.
+    /// @param[in] filePath: Path to the file to validate.
+    /// @returns A std::optional containing a vector of parsed values.
+    /// @throws
+    /// @version 2020-04-26/GGB - Function created.
+
+    CPriceUploadManager::parseFunctionReturn_t CPriceUploadManager::parseFile(boost::filesystem::path const &filepath)
+    {
+      parseFunctionReturn_t returnValue;
+
+        // Run through the validation functions to find a parser that will work.
+
+      if (!pluginMap().empty())
+      {
+        pricePlugin_t::const_iterator iterator = pluginMap().begin();
+        bool parserFound = false;
+
+        while (!parserFound && (iterator != pluginMap().end()))
+        {
+          parserFound = std::get<1>(iterator->second)(filepath);
+          if (!parserFound)
+          {
+            ++iterator;
+          };
+        };
+
+        if (parserFound)
+        {
+          returnValue = std::get<2>(iterator->second)(filepath);
+        };
+      };
+
+      return std::move(returnValue);
+    }
+
     /// @brief Returns the function pointer to the validation function.
     /// @param[in] pluginName: The plugin to find.
     /// @returns Function pointer.
@@ -124,7 +159,7 @@ namespace core
     /// @throws std::runtime_error
     /// @version 2020-04-26/GGB - Function created.
 
-    CPriceUploadManager::uploadFileFunction_t CPriceUploadManager::uploadFileFunction(std::string pluginName)
+    CPriceUploadManager::parseFileFunction_t CPriceUploadManager::parseFileFunction(std::string pluginName)
     {
       pricePlugin_t::const_iterator iterator = pluginMap().find(pluginName);
 

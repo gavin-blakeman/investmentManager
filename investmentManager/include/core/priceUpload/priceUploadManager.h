@@ -6,7 +6,7 @@
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core::priceUpload
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -63,12 +63,12 @@ namespace core
     {
     public:
       using pricesVector_t = std::vector<std::pair<std::tm, double>>;
-      using uploadFunctionReturn_t = std::optional<pricesVector_t>;
+      using parseFunctionReturn_t = std::optional<pricesVector_t>;
 
       using nameFunction_t = std::function<std::string()>;
       using validateFunction_t = std::function<bool(boost::filesystem::path const &)>;
-      using uploadFileFunction_t = std::function<uploadFunctionReturn_t(boost::filesystem::path const &)>;
-      using plugin_t = std::tuple<nameFunction_t, validateFunction_t, uploadFileFunction_t>;
+      using parseFileFunction_t = std::function<parseFunctionReturn_t(boost::filesystem::path const &)>;
+      using plugin_t = std::tuple<nameFunction_t, validateFunction_t, parseFileFunction_t>;
 
     private:
       using pricePlugin_t = std::unordered_map<std::string, plugin_t>;
@@ -81,16 +81,14 @@ namespace core
       static pricePlugin_t &pluginMap();
       static nameFunction_t nameFunction(std::string);
       static validateFunction_t validateFunction(std::string);
-      static uploadFileFunction_t uploadFileFunction(std::string);
+      static parseFileFunction_t parseFileFunction(std::string);
       static std::vector<std::string> registeredPlugins();
 
     public:
       static bool registerPlugin(plugin_t);
 
       static bool validateFile(boost::filesystem::path const &);
-
-
-
+      static parseFunctionReturn_t parseFile(boost::filesystem::path const &);
     };
 
   } // namespace priceUpload

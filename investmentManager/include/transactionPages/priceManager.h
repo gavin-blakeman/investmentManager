@@ -77,7 +77,7 @@ namespace transactions
   public:
     CPriceManager(CApplication *);
 
-    virtual void createPage();
+    virtual void createPage() override;
 
     void refreshTableView();
 

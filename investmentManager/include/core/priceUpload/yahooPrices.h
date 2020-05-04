@@ -6,7 +6,7 @@
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core::priceUpload
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -50,7 +50,7 @@ namespace core
     public:
       static std::string nameFunction() { return "Yahoo"; }
       static bool validateFunction(boost::filesystem::path const &);
-      static CPriceUploadManager::uploadFunctionReturn_t uploadFileFunction(boost::filesystem::path const &);
+      static CPriceUploadManager::parseFunctionReturn_t uploadFileFunction(boost::filesystem::path const &);
 
     };
 

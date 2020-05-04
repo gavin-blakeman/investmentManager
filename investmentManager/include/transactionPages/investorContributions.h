@@ -45,9 +45,13 @@ namespace transactions
     CInvestorContributions() = delete;
     CInvestorContributions(CInvestorContributions const &) = delete;
     CInvestorContributions(CInvestorContributions const &&) = delete;
+    CInvestorContributions operator= (CInvestorContributions const &) = delete;
+
 
   public:
-    CInvestorContributions(CApplication *parent) : CTransactionPage(parent) {}
+    CInvestorContributions(CApplication *parent);
+
+    virtual void createPage() override;
   };
 
 } // namespace transactions

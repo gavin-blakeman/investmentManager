@@ -1,0 +1,5 @@
+InvestmentManager Copyright ©2020 Gavin Blakeman. All rights reserved.
+
+InvestmentManager makes use of the Wt library. [4.1.3] 
+InvestmentManager makes use of the Boost libraries. [1.62.0] (Boost Software License)
+

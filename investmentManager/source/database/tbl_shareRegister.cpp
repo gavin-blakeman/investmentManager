@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_prices.cpp
+// FILE:                tbl_shareRegister
 // SUBSYSTEM:           gnuCash prices table
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           database
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,49 +26,22 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-02/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_prices.h"
-
-  // Miscellaneous library header files
-
-#include <GCL>
-
-  // investmentManager header files
-
-#include "include/core/priceUpload/priceUploadManager.h"
-#include "include/database/tbl_commodities.h"
+#include "include/database/tbl_shareRegister.h"
 
 namespace database
 {
-  /// @brief Uploads prices from the specified file. The file parameters are passed to the function.
-  /// @param[in] session: The database session to use.
-  /// @param[in] commodityCode: The code for the commodity to upload.
-  /// @param[in] uploadFilename: The path to the upload location.
-  /// @throws
-  /// @returns
-  /// @version 2020-05-02/GGB - Function created.
 
-  void priceUpload(Wt::Dbo::Session &session, std::string const &commodityCode, boost::filesystem::path const &uploadFilename)
+  /// @brief Inserts a share transaction into the database.
+  /// @param[in] session:
+
+
+  void tbl_shareRegister::addShareTransaction(Wt::Dbo::Session &, index_t, std::tm &, std::string const &, double, double, double)
   {
-    core::priceUpload::CPriceUploadManager::parseFunctionReturn_t parsedFile;
 
-    parsedFile = core::priceUpload::CPriceUploadManager::parseFile(uploadFilename);
-
-    if (parsedFile)
-    {
-        // The parsedFile variable nows has a number of values stored. This can now be uploaded to the relevant commodity.
-
-      std::optional<std::string> GUID = commodityGUID(session, commodityCode);
-      GCL::sqlwriter::CSQLWriter sqlWriter;
-
-      sqlWriter.insertInto("prices");
-
-
-
-    }
   }
 
 } // namespace database

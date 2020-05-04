@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_prices.cpp
-// SUBSYSTEM:           gnuCash prices table
+// FILE:                tbl_books.cpp
+// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,49 +26,54 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-04/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_prices.h"
+#include "include/database/tbl_books.h"
+
+  // Standard C++ library header files
+
+#include <exception>
+
+  // Wt++ framework header files
+
+#include <Wt/Dbo/Exception.h>
+#include <Wt/Dbo/Transaction.h>
 
   // Miscellaneous library header files
 
 #include <GCL>
 
-  // investmentManager header files
-
-#include "include/core/priceUpload/priceUploadManager.h"
-#include "include/database/tbl_commodities.h"
-
 namespace database
 {
-  /// @brief Uploads prices from the specified file. The file parameters are passed to the function.
-  /// @param[in] session: The database session to use.
-  /// @param[in] commodityCode: The code for the commodity to upload.
-  /// @param[in] uploadFilename: The path to the upload location.
-  /// @throws
-  /// @returns
-  /// @version 2020-05-02/GGB - Function created.
+  /// @brief Returns the root account GUID for the books.
+  /// @param[in] session: The sesion to use for database access.
+  /// @returns A string containing the GUID.
+  /// @throws std::runtime_error
+  /// @version 2020-05-04/GGB - Function created.
 
-  void priceUpload(Wt::Dbo::Session &session, std::string const &commodityCode, boost::filesystem::path const &uploadFilename)
+  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
   {
-    core::priceUpload::CPriceUploadManager::parseFunctionReturn_t parsedFile;
+    GCL::sqlwriter::CSQLWriter sqlWriter;
 
-    parsedFile = core::priceUpload::CPriceUploadManager::parseFile(uploadFilename);
+    sqlWriter.select({"root_account_guid"}).from("books");
+    std::string returnValue;
 
-    if (parsedFile)
+    try
     {
-        // The parsedFile variable nows has a number of values stored. This can now be uploaded to the relevant commodity.
+      Wt::Dbo::Transaction transaction { session };
 
-      std::optional<std::string> GUID = commodityGUID(session, commodityCode);
-      GCL::sqlwriter::CSQLWriter sqlWriter;
-
-      sqlWriter.insertInto("prices");
-
-
-
+      returnValue = session.query<std::string>(sqlWriter.string());
     }
-  }
+    catch(Wt::Dbo::Exception const &e)
+    {
+        // This is a critical error as we cannot open the books. Might as well throw and exit.
 
-} // namespace database
+      CRITICALMESSAGE(e.what());
+      throw std::runtime_error(e.what());
+    };
+
+    return returnValue;
+  }
+}

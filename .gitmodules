@@ -7,3 +7,6 @@
 [submodule "SCL"]
 	path = SCL
 	url = https://github.com/gavin-blakeman/SCL.git
+[submodule "QCL"]
+	path = QCL
+	url = https://github.com/gavin-blakeman/QCL.git
