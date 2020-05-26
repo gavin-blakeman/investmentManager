@@ -46,11 +46,15 @@
 
 #include <GCL>
 
+  // investmentManager header files
+
+#include "include/database/tbl_books.h"
+
 namespace database
 {
   static std::unordered_map< tbl_accounts::EAccountType, std::string> szAccountTypes =
   {
-    {tbl_accounts::NONE, "This is an apple"},
+    {tbl_accounts::NONE, "NONE"},
     {tbl_accounts::ASSET, "ASSET"},
     {tbl_accounts::INCOME, "INCOME"},
     {tbl_accounts::EXPENSE, "EXPENSE"},
@@ -81,7 +85,7 @@ namespace database
                                        std::int32_t,   // [5] accounts.commodity_scu
                                        std::int32_t>;  // [6] accounts.non_std_scu
 
-    GCL::sqlwriter::CSQLWriter sqlWriter;
+    GCL::sqlWriter sqlWriter;
     Wt::Dbo::collection<accountsTable_t>  accountCollection;
     std::vector<accountsTable_t> accountVector;
 
@@ -109,6 +113,8 @@ namespace database
 
       // Now create the hierarchy.
 
+    accountHierarchy.setRootValue(tbl_books::rootAccountGUID(session));
+
     for (auto const element: accountVector)
     {
       accountHierarchy.insert(std::get<0>(element),
@@ -119,6 +125,32 @@ namespace database
                                               std::get<6>(element) == 0 ? std::get<5>(element) : std::get<6>(element),
                                               0));
     };
+  }
+
+  /// @brief Returns the commodity GUID for the specified account GUID.
+  /// @param[in] session: The session to use.
+  /// @param[in] accountGUID: The account GUID to find the currency for.
+  /// @returns A std::optional containing the commodityGUID if found.
+
+  std::optional<std::string> tbl_accounts::commodityGUID(Wt::Dbo::Session &session, std::string const &accountGUID)
+  {
+    std::optional<std::string> returnValue;
+    GCL::sqlWriter sqlWriter;
+
+    sqlWriter.select({"commodity_guid"}).from("accounts").where("guid", "=", accountGUID);
+    try
+    {
+      Wt::Dbo::Transaction transaction(session);
+
+      returnValue = session.query<std::string>(sqlWriter.string());
+    }
+    catch(Wt::Dbo::Exception &e)
+    {
+      ERRORMESSAGE(e.what());
+    };
+
+
+    return returnValue;
   }
 
 

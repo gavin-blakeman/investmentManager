@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                /core/shareFunctions/shareFunctions.h
-// SUBSYSTEM:           Functions for managing fund shares
+// FILE:                /core/fraction.cpp
+// SUBSYSTEM:           Fraction functions
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           core::shareFunctions
+// NAMESPACE:           core
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,19 +26,44 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-02/GGB - File created.
+// HISTORY:             2020-05-26/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef SHAREFUNCTIONS_H
-#define SHAREFUNCTIONS_H
+#include "include/core/functions/fraction.h"
 
-namespace core
+  // Standard C++ library header files
+
+#include <cmath>
+#include <limits>
+
+  // Miscellaneous library header files
+
+#include <GCL>
+
+
+namespace fraction
 {
-  namespace shareFunctions
-  {
+  /// @brief composes a fraction from the value that is passed.
+  /// @param[in] value: The value to convert to a fraction.
+  /// @param[in] decimalDigits: The minimum number of digits after the decimal point to preserve. (Maximum value = 10)
+  /// @returns std::pair<numerator, denominator>
+  /// @throws GCL::runtime_assert
+  /// @version 2020-05-26/GGB - Function created.
 
+  MCL::fraction_t composeFraction(double value, std::uint_least8_t decimalDigits)
+  {
+    RUNTIME_ASSERT("Fraction", std::abs(value) <= std::numeric_limits<std::int64_t>::max(), "value >= maximum value stored in fraction");
+    RUNTIME_ASSERT("Fraction", decimalDigits <= 10, "Use decimal digits <= 10");
+
+    std::int64_t n, d;
+
+    n = static_cast<std::int64_t>(std::trunc(value));
+    value = std::abs(value);
+    value -= std::abs(n);
+    value *= 10 ^ decimalDigits;
+    d = static_cast<std::int64_t>(std::trunc(value));
+
+    return MCL::fraction_t(n, d);
   }
 }
-
-#endif // SHAREFUNCTIONS_H

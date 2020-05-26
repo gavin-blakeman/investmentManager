@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                tbl_splits
+// SUBSYSTEM:           gnuCash splits table
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -24,56 +24,43 @@
 //                      You should have received a copy of the GNU General Public License along with investmentManager.  If not,
 //                      see <http://www.gnu.org/licenses/>.
 //
-// OVERVIEW:
+// OVERVIEW:            The commodities table is organised as a namespace:mnemonic pair. The namespace does not sit in a different
+//                      table, so the data is stored multiple times in the table.
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-05-26/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#ifndef TBL_SPLITS_H
+#define TBL_SPLITS_H
 
   // Standard C++ library header files
 
-#include <exception>
+#include <string>
+#include <vector>
 
   // Wt++ framework header files
 
-#include <Wt/Dbo/Exception.h>
-#include <Wt/Dbo/Transaction.h>
-
-  // Miscellaneous library header files
-
-#include <GCL>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/Session.h>
 
 namespace database
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
-
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
+  class tbl_splits
   {
-    GCL::sqlWriter sqlWriter;
-
-    sqlWriter.select({"root_account_guid"}).from("books");
-    std::string returnValue;
-
-    try
+  public:
+    struct split_t
     {
-      Wt::Dbo::Transaction transaction { session };
-
-      returnValue = session.query<std::string>(sqlWriter.string());
-    }
-    catch(Wt::Dbo::Exception const &e)
-    {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
-
-      CRITICALMESSAGE(e.what());
-      throw std::runtime_error(e.what());
+      std::string account_guid;
+      std::string memo;
+      std::string action;
+      double value;
+      double quantity;
     };
+    using splits_t = std::vector<split_t>;
 
-    return returnValue;
-  }
+    static void insertSplits(Wt::Dbo::Session &, std::string const &, splits_t const &);
+  };
 }
+
+#endif // TBL_SPLITS_H

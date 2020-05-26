@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                /core/fraction.h
+// SUBSYSTEM:           Fraction functions
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,54 +26,25 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-05-26/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#ifndef FRACTION_H
+#define FRACTION_H
 
   // Standard C++ library header files
 
-#include <exception>
-
-  // Wt++ framework header files
-
-#include <Wt/Dbo/Exception.h>
-#include <Wt/Dbo/Transaction.h>
+#include <cstdint>
+#include <utility>
 
   // Miscellaneous library header files
 
-#include <GCL>
+#include <MCL>
 
-namespace database
+namespace core
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
-
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
-  {
-    GCL::sqlWriter sqlWriter;
-
-    sqlWriter.select({"root_account_guid"}).from("books");
-    std::string returnValue;
-
-    try
-    {
-      Wt::Dbo::Transaction transaction { session };
-
-      returnValue = session.query<std::string>(sqlWriter.string());
-    }
-    catch(Wt::Dbo::Exception const &e)
-    {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
-
-      CRITICALMESSAGE(e.what());
-      throw std::runtime_error(e.what());
-    };
-
-    return returnValue;
-  }
+  MCL::fraction_t composeFraction(double, std::uint_least8_t = 4);
 }
+
+#endif // FRACTION_H

@@ -40,7 +40,7 @@
 
 namespace database
 {
-  typedef std::int32_t index_t;
+  using index_t = std::int32_t;
   using GUID_t = std::string;
 
 } // namespace database

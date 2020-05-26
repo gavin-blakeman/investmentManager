@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                tbl_transactions.h
+// SUBSYSTEM:           Transaction (Menu) database table definitions
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,54 +26,43 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-04-19/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#ifndef TBL_TRANSACTIONS_H
+#define TBL_TRANSACTIONS_H
 
-  // Standard C++ library header files
+  // Wt framework header files.
 
-#include <exception>
+#include <Wt/Dbo/Dbo.h>
 
-  // Wt++ framework header files
+  // investementManager application header files
 
-#include <Wt/Dbo/Exception.h>
-#include <Wt/Dbo/Transaction.h>
-
-  // Miscellaneous library header files
-
-#include <GCL>
+#include "databaseTables.h"
+#include "include/menuConstants.h"
 
 namespace database
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
 
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
+  class tbl_menuItems
   {
-    GCL::sqlWriter sqlWriter;
+  public:
+    transaction_t parentID;
+    std::int32_t sortOrder;
+    std::string menuText;
+    std::string transactionCode;
 
-    sqlWriter.select({"root_account_guid"}).from("books");
-    std::string returnValue;
-
-    try
+    template<class Action>
+    void persist(Action &a)
     {
-      Wt::Dbo::Transaction transaction { session };
-
-      returnValue = session.query<std::string>(sqlWriter.string());
+      Wt::Dbo::field(a, parentID, "ParentID");
+      Wt::Dbo::field(a, menuText, "MenuText");
+      Wt::Dbo::field(a, sortOrder, "SortOrder");
+      Wt::Dbo::field(a, transactionCode, "TransactionCode");
     }
-    catch(Wt::Dbo::Exception const &e)
-    {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
+  };
+} // namespace database
 
-      CRITICALMESSAGE(e.what());
-      throw std::runtime_error(e.what());
-    };
 
-    return returnValue;
-  }
-}
+#endif // TBL_TRANSACTIONS_H

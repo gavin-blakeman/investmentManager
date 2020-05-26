@@ -53,10 +53,10 @@ namespace database
     {
       Wt::Dbo::Transaction transaction { session };
 
-      GCL::sqlwriter::CSQLWriter sqlWriter;
+      GCL::sqlWriter sqlWriter;
 
       sqlWriter.select({"commodities.guid"}).from("commodities")
-          .where({GCL::sqlwriter::parameterTriple("commodities.mnemonic", "=", mnemonic)});
+          .where("commodities.mnemonic", "=", mnemonic);
 
       returnValue = session.query<std::string>(sqlWriter.string());
 

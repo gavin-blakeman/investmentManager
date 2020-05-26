@@ -35,7 +35,7 @@
 
   // investmentManager header files
 
-#include "include/core/priceUpload/priceUploadManager.h".h"
+#include "include/core/priceUpload/priceUploadManager.h"
 
 namespace core
 {

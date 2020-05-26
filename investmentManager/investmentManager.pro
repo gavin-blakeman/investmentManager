@@ -33,8 +33,8 @@
 TARGET = investmentManager.wt
 TEMPLATE = app
 
-QT += core sql
-QT -= gui
+#QT += core
+QT -= gui core
 
 CONFIG += console
 CONFIG -= app_bundle
@@ -81,7 +81,14 @@ SOURCES += \
     source/database/tbl_commodities.cpp \
     source/database/tbl_shareRegister.cpp \
     source/database/tbl_accounts.cpp \
-    source/database/tbl_books.cpp
+    source/database/tbl_books.cpp \
+    source/core/accountTransactions/memberInvestment.cpp \
+    source/database/tbl_accountMapping.cpp \
+    source/database/tbl_transactions.cpp \
+    source/database/tbl_applicationData.cpp \
+    source/core/functions/guid.cpp \
+    source/database/tbl_splits.cpp \
+    source/core/functions/fraction.cpp
 
 HEADERS += \
     include/application.h \
@@ -89,7 +96,6 @@ HEADERS += \
     include/database/databaseDefinitions.h \
     include/database/databaseTables.h \
     include/database/session.h \
-    include/transactions.h \
     include/database/tbl_users.h \
     include/transactionPages/transactionPage.h \
     include/models/menuModel.h \
@@ -97,7 +103,6 @@ HEADERS += \
     include/permissionSystem.h \
     include/views/menuView.h \
     include/configSettings.h \
-    include/database/tbl_transactions.h \
     include/transactionPages/investorContributions.h \
     include/database/tbl_applicationData.h \
     include/database/tbl_accounts.h \
@@ -108,9 +113,17 @@ HEADERS += \
     include/models/pricesModel.h \
     include/dialogs/priceUpload.h \
     include/core/priceUpload/priceUploadManager.h \
-    include/core/shareFunctions/shareFunctions.h \
     include/database/tbl_shareRegister.h \
-    include/database/tbl_books.h
+    include/database/tbl_books.h \
+    include/database/tbl_menuItems.h \
+    include/menuConstants.h \
+    include/core/accountTransactions/memberInvestment.h \
+    include/database/tbl_accountMapping.h \
+    include/database/tbl_transactions.h \
+    include/core/guid.hpp \
+    include/core/functions/guid.h \
+    include/database/tbl_splits.h \
+    include/core/functions/fraction.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
 LIBS += -L/usr/local/lib -lboost_system

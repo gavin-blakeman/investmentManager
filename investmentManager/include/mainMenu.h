@@ -45,7 +45,7 @@
 
   // SAMAP55 header files.
 
-#include "transactions.h"
+#include "menuConstants.h"
 
 struct SMenuEntry
 {

@@ -1,7 +1,7 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_applicationData
+// FILE:                tbl_applicationData.cpp
 // SUBSYSTEM:           Table used for storing application related data.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
@@ -29,79 +29,49 @@
 //                      menu functions. The data stored in the table is used for connections within the database and it is not
 //                      prudent to store this in configuration files.
 //
-// HISTORY:             2020-04-21/GGB - File created.
+// HISTORY:             2020-05-09/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef TBL_APPLICATIONDATA_H
-#define TBL_APPLICATIONDATA_H
+#include "include/database/tbl_applicationData.h"
 
-  // C++ standard library header files
+  // Wt++ framework header files
 
-#include <cstdint>
-#include <string>
-#include <unordered_map>
-#include <utility>
+#include <Wt/Dbo/Exception.h>
+#include <Wt/Dbo/Transaction.h>
 
-  // Wt framework header files
+  // Miscellaneous library header files
 
-#include <Wt/Dbo/Dbo.h>
-#include <Wt/Dbo/Types.h>
-#include <Wt/Dbo/Session.h>
-#include <Wt/WGlobal.h>
+#include <GCL>
 
-  // investmentManager header files
-
-#include "include/database/databaseDefinitions.h"
-#include "include/database/databaseTables.h"
-
-namespace Wt
-{
-  namespace Dbo
-  {
-    // Specialise the default traits for the table. This is required as the table does not have a version field and also
-    // does not use a surrogate ID field.
-
-    template<>
-    struct dbo_traits<database::tbl_applicationData> : public dbo_default_traits
-    {
-      typedef std::string IdType;
-
-      static const char *versionField() { return 0; }
-      static const char *surrogateIdField() { return 0; }
-      static IdType invalidId() { return std::string(); }
-    };
-  } // namespace Dbo
-} // namespace Wt
 
 namespace database
 {
-
-  class tbl_applicationData
+  static std::unordered_map<tbl_applicationData::EApplicationData, std::string> applicationDataMap =
   {
-  public:
-    enum EApplicationData
-    {
-      ACCOUNT_MEMBERSQUITY,
-      ACCOUNT_TAXPAYABLE,
-      DEFAULT_CURRENCY,           ///< The default currency to use for all transactions unless otherwise specified.
-    };
-
-    std::string token;
-    std::string value;
-
-    template<class Action>
-    void persist(Action & a)
-    {
-      Wt::Dbo::id(a, token, "Token", 64);
-      Wt::Dbo::field(a, value, "Value");
-    }
-
-    static std::string applicationData(Wt::Dbo::Session &, EApplicationData);
-
-
+    {tbl_applicationData::ACCOUNT_MEMBERSQUITY, "Account - Members Equity"},
+    {tbl_applicationData::ACCOUNT_TAXPAYABLE, "Account - Tax Payable"},
+    {tbl_applicationData::DEFAULT_CURRENCY, "Default Currency"}
   };
 
-} // namespace database
+  /// @brief S
+  /// @param[in[ session: The session to use to access the database
+  /// @param[in] applicationData: The application data index to access.
+  /// @returns The relevant session data as a string.
+  /// @throws
+  /// @version 2020-05-09/GGB - Function created.
 
-#endif // TBL_APPLICATIONDATA_H
+  std::string tbl_applicationData::applicationData(Wt::Dbo::Session &session, EApplicationData applicationData)
+  {
+    Wt::Dbo::Transaction transaction(session);
+
+    GCL::sqlWriter sqlWriter;
+
+    sqlWriter.select({"Value"}).from("im_applicationData").where("ID", "=", applicationData);
+    std::string value = session.query<std::string>(sqlWriter.string());
+
+    return value;
+
+  }
+
+}

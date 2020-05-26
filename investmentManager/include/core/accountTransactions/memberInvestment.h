@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                /core/transactions/memberInvestment.h
+// SUBSYSTEM:           Functions performing transactions
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core::accountTransactions
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,54 +26,33 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-05-02/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#ifndef MEMBERINVESTMENT_H
+#define MEMBERINVESTMENT_H
 
   // Standard C++ library header files
 
-#include <exception>
+#include <cstdint>
+#include <ctime>
 
   // Wt++ framework header files
 
-#include <Wt/Dbo/Exception.h>
-#include <Wt/Dbo/Transaction.h>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/Session.h>
 
-  // Miscellaneous library header files
+  // InvestmentManager header files
 
-#include <GCL>
+#include "include/database/databaseDefinitions.h"
 
-namespace database
+namespace core
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
-
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
+  namespace accountTransactions
   {
-    GCL::sqlWriter sqlWriter;
-
-    sqlWriter.select({"root_account_guid"}).from("books");
-    std::string returnValue;
-
-    try
-    {
-      Wt::Dbo::Transaction transaction { session };
-
-      returnValue = session.query<std::string>(sqlWriter.string());
-    }
-    catch(Wt::Dbo::Exception const &e)
-    {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
-
-      CRITICALMESSAGE(e.what());
-      throw std::runtime_error(e.what());
-    };
-
-    return returnValue;
+    void memberInvestment(Wt::Dbo::Session &, database::index_t);
   }
 }
+
+#endif // MEMBERINVESTMENT_H

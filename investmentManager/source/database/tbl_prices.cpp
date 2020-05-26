@@ -62,7 +62,7 @@ namespace database
         // The parsedFile variable nows has a number of values stored. This can now be uploaded to the relevant commodity.
 
       std::optional<std::string> GUID = commodityGUID(session, commodityCode);
-      GCL::sqlwriter::CSQLWriter sqlWriter;
+      GCL::sqlWriter sqlWriter;
 
       sqlWriter.insertInto("prices");
 

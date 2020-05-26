@@ -39,7 +39,7 @@
   // investmentmanager header files.
 
 #include "include/application.h"
-#include "include/transactions.h"
+#include "include/menuConstants.h"
 
 /// @brief Constructor for the menu tree view.
 /// @param[in] np: The application object that owns this.

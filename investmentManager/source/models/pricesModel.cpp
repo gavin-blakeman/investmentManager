@@ -208,7 +208,7 @@ namespace models
         // Read the data
 
       {
-        GCL::sqlwriter::CSQLWriter sqlWriter;
+        GCL::sqlWriter sqlWriter;
 
         sqlWriter.
             select({ "prices.date",
@@ -219,7 +219,7 @@ namespace models
                    })
             .from("prices")
             .where("prices.commodity_guid", "=", commodityGUID)
-            .orderBy({std::make_pair("prices.date", GCL::sqlwriter::ASC)})
+            .orderBy({std::make_pair("prices.date", GCL::sqlWriter::ASC)})
             .offset(blockStart)
             .limit(cacheReadRecords);
 

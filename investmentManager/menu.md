@@ -13,7 +13,7 @@
 3510        Unit Purchase                 [0]   IM510
 3520        Unit Redemption               [1]   IM520
 
-4000    Fund Manager
+4000    Fund Manager                  [2]
 4100      Investment Overview
 4110        Share Performance
 4120        Bonds Performance
@@ -21,17 +21,16 @@
 
 
 
-5000    Master Data Administration              MD000
+5000    Master Data Administration    [3]       MD000
 5100      Commodity & Price Manager             MD100
 5110        Commodity Manager                   MD110
 5120        Share Price Manager                 MD120
 5200      Member/Investor Management            MD200
 
-1000    Application Data
-1100      User & Permission Management
-1110        User & Roles
-1120        Roles
-1130        Transaction Roles
-1200      Database Management
-1210        Database Connection           *** Delete ***
-1220        Table Names                   *** Delete ***
+1000    Application Data              [4]
+1100      User & Permission Management  [0]
+1110        User & Roles                  [0]
+1120        Roles                         [1]
+1130        Menu ItemRoles                [2]
+1200      Database Management           [1]
+1210        Account Mapping               [0]

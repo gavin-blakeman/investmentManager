@@ -58,7 +58,7 @@
 
 #include "models/menuModel.h"
 #include "permissionSystem.h"
-#include "transactions.h"
+#include "menuConstants.h"
 #include "database/session.h"
 #include "transactionPages/transactionPage.h"
 

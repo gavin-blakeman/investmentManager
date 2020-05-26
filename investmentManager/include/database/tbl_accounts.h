@@ -105,6 +105,8 @@ namespace database
 
     static void buildHierarchy(Wt::Dbo::Session &, EAccountType, accountHierarchy_t &);
 
+    static std::optional<std::string> commodityGUID(Wt::Dbo::Session &, std::string const &);
+
   };  // class tbl_accounts
 
 }   // namespace database

@@ -2,7 +2,7 @@
 //
 // PROJECT:             Investment Manager
 // FILE:                tbl_transactions.h
-// SUBSYSTEM:           Transaction (Menu) database table definitions
+// SUBSYSTEM:           Table management to match the gnuCash 'transactions' table.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,43 +26,30 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-07/GGB - File created.
 //
 //**********************************************************************************************************************************
 
 #ifndef TBL_TRANSACTIONS_H
 #define TBL_TRANSACTIONS_H
 
-  // Wt framework header files.
+  // Standard C++ library headers
 
-#include <Wt/Dbo/Dbo.h>
+#include <cstdint>
+#include <chrono>
+#include <string>
 
-  // investementManager application header files
+  // Wt++ framework header files
 
-#include "databaseTables.h"
-#include "include/transactions.h"
+#include <Wt/Dbo/Session.h>
 
 namespace database
 {
-
   class tbl_transactions
   {
   public:
-    transaction_t parentID;
-    std::int32_t sortOrder;
-    std::string menuText;
-    std::string transactionCode;
-
-    template<class Action>
-    void persist(Action &a)
-    {
-      Wt::Dbo::field(a, parentID, "ParentID");
-      Wt::Dbo::field(a, menuText, "MenuText");
-      Wt::Dbo::field(a, sortOrder, "SortOrder");
-      Wt::Dbo::field(a, transactionCode, "TransactionCode");
-    }
+    static std::string insertTransaction(Wt::Dbo::Session &, std::string const &, std::string const &, std::tm &, std::string const &);
   };
 } // namespace database
-
 
 #endif // TBL_TRANSACTIONS_H

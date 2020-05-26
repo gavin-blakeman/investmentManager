@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                tbl_accountMapping.h
+// SUBSYSTEM:           Account mapping table. Table to map gnuCash account GUID to application defined accounts.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,54 +26,42 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-05-05/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#ifndef TBL_ACCOUNTMAPPING_H
+#define TBL_ACCOUNTMAPPING_H
 
   // Standard C++ library header files
 
-#include <exception>
+#include <cstdint>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
   // Wt++ framework header files
 
-#include <Wt/Dbo/Exception.h>
-#include <Wt/Dbo/Transaction.h>
-
-  // Miscellaneous library header files
-
-#include <GCL>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/Session.h>
 
 namespace database
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
-
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
+  class tbl_accountMapping
   {
-    GCL::sqlWriter sqlWriter;
-
-    sqlWriter.select({"root_account_guid"}).from("books");
-    std::string returnValue;
-
-    try
+  public:
+    enum EAccountMapping
     {
-      Wt::Dbo::Transaction transaction { session };
-
-      returnValue = session.query<std::string>(sqlWriter.string());
-    }
-    catch(Wt::Dbo::Exception const &e)
-    {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
-
-      CRITICALMESSAGE(e.what());
-      throw std::runtime_error(e.what());
+      INVESTMENTCASHDEPOSIT = 1,  ///< Investment cash deposit account
+      TRADINGCASH,                ///< Trading cash account
+      MEMBERS_EQUITY,             ///< Members equity account.
+      RETAINED_EQUITY,            ///< Retained equity after closing of books. Accumulative.
     };
 
-    return returnValue;
-  }
-}
+    static std::string accountGUID(Wt::Dbo::Session &, EAccountMapping);
+    static void updateAccount(Wt::Dbo::Session &, EAccountMapping, std::string);
+    static std::unordered_map<EAccountMapping, std::string> const &accountMap();
+  };
+} // namespace database
+
+#endif // TBL_ACCOUNTMAPPING_H

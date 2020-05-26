@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                tbl_accountMapping.h
+// SUBSYSTEM:           Account mapping table. Table to map gnuCash account GUID to application defined accounts.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,11 +26,11 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-05-05/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#include "include/database/tbl_accountMapping.h"
 
   // Standard C++ library header files
 
@@ -47,33 +47,50 @@
 
 namespace database
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
-
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
+  static std::unordered_map<tbl_accountMapping::EAccountMapping, std::string> accountMapData =
   {
-    GCL::sqlWriter sqlWriter;
+    {tbl_accountMapping::INVESTMENTCASHDEPOSIT, "Investment Cash Deposit"},
+    {tbl_accountMapping::TRADINGCASH, "Trading Cash Deposit"},
+    {tbl_accountMapping::MEMBERS_EQUITY, "Members Equity"},
+    {tbl_accountMapping::RETAINED_EQUITY, "Retained Equity"},
+  };
 
-    sqlWriter.select({"root_account_guid"}).from("books");
+  /// @brief Obtains account GUID's for specified accounts. These GUID's are based on the account mappings that need to be set up.
+  /// @param[in] session: The session to use
+  /// @param[in] accountMap: The specified account to map to GUID.
+  /// @returns A std::string containing the specified account GUID.
+  /// @throws
+  /// @version 2020-05-05/GGB - Function created.
+
+  std::string tbl_accountMapping::accountGUID(Wt::Dbo::Session &session, EAccountMapping accountMap)
+  {
     std::string returnValue;
+    GCL::sqlWriter sqlWriter;
 
     try
     {
-      Wt::Dbo::Transaction transaction { session };
+      sqlWriter.select({"AccountGUID"}).from("im_accountMapping").where("ID", "=", accountMap);
 
-      returnValue = session.query<std::string>(sqlWriter.string());
+      Wt::Dbo::Transaction transaction(session);
     }
-    catch(Wt::Dbo::Exception const &e)
+    catch(Wt::Dbo::Exception &e)
     {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
-
       CRITICALMESSAGE(e.what());
       throw std::runtime_error(e.what());
     };
 
-    return returnValue;
+   return returnValue;
   }
-}
+
+  /// @brief Returns a constant reference to the list of all possible accounts to map.
+  /// @returns a const reference to the accountMapData map.
+  /// @throws None.
+  /// @version 2020-05-05/GGB - Function created.
+
+  std::unordered_map<tbl_accountMapping::EAccountMapping, std::string> const &tbl_accountMapping::accountMap()
+  {
+    return accountMapData;
+  }
+
+
+} // namespace database

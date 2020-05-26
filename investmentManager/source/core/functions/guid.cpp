@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_books.cpp
-// SUBSYSTEM:           Table management to match the gnuCash 'books' table.
+// FILE:                /core/guid.hpp
+// SUBSYSTEM:           GUID related functions.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           core
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,54 +26,73 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-05-04/GGB - File created.
+// HISTORY:             2020-05-25/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#include "include/database/tbl_books.h"
+#include "include/core/functions/guid.h"
 
   // Standard C++ library header files
 
-#include <exception>
-
-  // Wt++ framework header files
-
-#include <Wt/Dbo/Exception.h>
-#include <Wt/Dbo/Transaction.h>
+#include <cstdint>
 
   // Miscellaneous library header files
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <GCL>
 
-namespace database
+namespace core
 {
-  /// @brief Returns the root account GUID for the books.
-  /// @param[in] session: The sesion to use for database access.
-  /// @returns A string containing the GUID.
-  /// @throws std::runtime_error
-  /// @version 2020-05-04/GGB - Function created.
+  /// @brief Convert single digit hexadecimal value to a hex character.
+  /// @param[in] i: Value to convert.
+  /// @returns The corresponding character value.
+  /// @throws GCL::runtimeAssert
+  /// @version 2020-05-08/GGB - Function created.
 
-  std::string tbl_books::rootAccountGUID(Wt::Dbo::Session &session)
+  inline char toChar(std::uint_least8_t i)
   {
-    GCL::sqlWriter sqlWriter;
+    RUNTIME_ASSERT("InvestmentManager", i < 16, "Parameter must be < 16.");
 
-    sqlWriter.select({"root_account_guid"}).from("books");
-    std::string returnValue;
+    char returnValue;
 
-    try
+    if (i <= 9)
     {
-      Wt::Dbo::Transaction transaction { session };
-
-      returnValue = session.query<std::string>(sqlWriter.string());
+      returnValue = static_cast<char>('0' + i);
     }
-    catch(Wt::Dbo::Exception const &e)
+    else
     {
-        // This is a critical error as we cannot open the books. Might as well throw our toys and exit.
-
-      CRITICALMESSAGE(e.what());
-      throw std::runtime_error(e.what());
+      returnValue = static_cast<char>('a' + (i-10));
     };
 
     return returnValue;
   }
-}
+
+  /// @brief Function to generate a GUID in the correct format for gnuCash.
+  /// @returns A std::string containing a 32 characted GUID.
+  /// @throws GCL::runtimeAssert.
+  /// @version 2020-05-08/GGB - Function created.
+
+  std::string generateGUID()
+  {
+    std::string returnValue;
+    static boost::uuids::random_generator randomGenerator;
+
+    boost::uuids::uuid UUID = randomGenerator();
+
+    returnValue.reserve(32);
+
+    std::size_t i=0;
+    for (boost::uuids::uuid::const_iterator it_data = UUID.begin(); it_data!=UUID.end(); ++it_data, ++i)
+    {
+      const size_t hi = ((*it_data) >> 4) & 0x0F;
+      returnValue += toChar(hi);
+
+      const size_t lo = (*it_data) & 0x0F;
+      returnValue += toChar(lo);
+    };
+
+    return returnValue;
+  }
+
+} // namespace core
