@@ -36,6 +36,7 @@
   // Standard C++ library header files
 
 #include <cstdint>
+#include <ctime>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -79,36 +80,31 @@
 
 namespace database
 {
-  class tbl_accounts
+  namespace tbl_accounts
   {
-  public:
-    enum EAccountType
+    enum EHierarchyType
     {
-      NONE,
       ASSET,
       INCOME,
       EXPENSE,
       EQUITY,
-      MUTUAL,
-      STOCK,
-      BANK,
-      ROOT,
       LIABILITY,
     };
 
     using accountHierarchy_t = SCL::hierarchy<std::string,                  ///< account.guid
-                                              std::tuple<std::string,       ///< account.name
+                                              std::tuple<std::string,       ///< account.type
+                                                         std::string,       ///< account.name
                                                          std::string,       ///< account.description
                                                          std::string,       ///< account.commodity_guid
                                                          std::int32_t,      ///< scu
                                                          double>>;          ///< value
 
-    static void buildHierarchy(Wt::Dbo::Session &, EAccountType, accountHierarchy_t &);
+    void buildHierarchy(Wt::Dbo::Session &, EHierarchyType, accountHierarchy_t &);
+    std::optional<double> accountValue(Wt::Dbo::Session &, std::string, std::tm &);
 
-    static std::optional<std::string> commodityGUID(Wt::Dbo::Session &, std::string const &);
+    std::optional<std::string> commodityGUID(Wt::Dbo::Session &, std::string const &);
 
-  };  // class tbl_accounts
-
+  }  // namespace tbl_accounts
 }   // namespace database
 
 #endif // TBL_ACCOUNTS_H

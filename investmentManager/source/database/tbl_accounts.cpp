@@ -34,6 +34,7 @@
 
   // Standard C++ library header files
 
+#include <iterator>
 #include <unordered_map>
 #include <vector>
 
@@ -52,106 +53,152 @@
 
 namespace database
 {
-  static std::unordered_map< tbl_accounts::EAccountType, std::string> szAccountTypes =
+  namespace tbl_accounts
   {
-    {tbl_accounts::NONE, "NONE"},
-    {tbl_accounts::ASSET, "ASSET"},
-    {tbl_accounts::INCOME, "INCOME"},
-    {tbl_accounts::EXPENSE, "EXPENSE"},
-    {tbl_accounts::EQUITY, "EQUITY"},
-    {tbl_accounts::MUTUAL, "MUTUAL"},
-    {tbl_accounts::STOCK, "STOCK"},
-    {tbl_accounts::BANK, "BANK"},
-    {tbl_accounts::ROOT, "ROOT"},
-    {tbl_accounts::LIABILITY, "LIABILITY"},
-  };
-
-  /// @brief Returns an account hierarchy for a specific type of accounts.
-  /// @param[in] session: The session to use for DBMS access.
-  /// @param[in] accountType: The account types to return.
-  /// @returns A hierarchy of account types.
-  /// @throws
-  /// @version 2020-05-03/GGB - Function created.
-
-  void tbl_accounts::buildHierarchy(Wt::Dbo::Session &session,
-                                    EAccountType accountType,
-                                    accountHierarchy_t &accountHierarchy)
-  {
-    using accountsTable_t = std::tuple<std::string,    // [0] accounts.guid
-                                       std::string,    // [1] accounts.parent_guid
-                                       std::string,    // [2] accounts.name
-                                       std::string,    // [3] accounts.description
-                                       std::string,    // [4] accounts.commodity_guid
-                                       std::int32_t,   // [5] accounts.commodity_scu
-                                       std::int32_t>;  // [6] accounts.non_std_scu
-
-    GCL::sqlWriter sqlWriter;
-    Wt::Dbo::collection<accountsTable_t>  accountCollection;
-    std::vector<accountsTable_t> accountVector;
-
-    sqlWriter
-        .select({
-                  "accounts.guid",
-                  "accounts.parent_guid",
-                  "accounts.name",
-                  "accounts.description",
-                  "accounts.commodity_guid",
-                  "accounts.commodity_scu",
-                  "accounts.non_std_scu"})
-        .from("accounts")
-        .where("accounts.account_type", "=", szAccountTypes[accountType]);
-
-    try
+    static std::unordered_map< tbl_accounts::EHierarchyType, std::string> szAccountTypes =
     {
-      accountCollection = session.query<accountsTable_t>(sqlWriter.string());
-      accountVector.assign(accountCollection.begin(), accountCollection.end());
-    }
-    catch(Wt::Dbo::Exception &e)
-    {
-      ERRORMESSAGE(e.what());
+      {tbl_accounts::ASSET, "ASSET"},
+      {tbl_accounts::INCOME, "INCOME"},
+      {tbl_accounts::EXPENSE, "EXPENSE"},
+      {tbl_accounts::EQUITY, "EQUITY"},
+      {tbl_accounts::LIABILITY, "LIABILITY"},
     };
+
+    /// @brief Determines the account value of the specified account.
+    /// @details This function is more complicate than it looks at first. To determine the value of stock or bond accounts takes
+    ///          lookups into the stock value tables. (If available.)
+    /// @param[in] session: The session to use for database access.
+    /// @param[in] accountGUID: The guid of the account being totalled.
+    /// @param[in] closingDate: The closing date to determine the value on.
+    /// @throws
+    /// @version 2020-05-27/GGB - Function created.
+
+    std::optional<double> accountValue(Wt::Dbo::Session &session, std::string, std::tm &)
+    {
+
+    }
+
+    /// @brief Returns an account hierarchy for a specific type of accounts.
+    /// @param[in] session: The session to use for DBMS access.
+    /// @param[in] accountType: The account types to return.
+    /// @returns A hierarchy of account types.
+    /// @throws
+    /// @version 2020-05-03/GGB - Function created.
+
+    void buildHierarchy(Wt::Dbo::Session &session,
+                        EHierarchyType accountType,
+                        accountHierarchy_t &accountHierarchy)
+    {
+      /* Any account hierarchy starts with the root account, available from the 'books' table. To build the table of accounts,
+       * an iterative approach needs to be taken, building each level recursively using the parent_guid. This is necessary as the
+       * accounts need not all be of the same type. (IE stocks can be children of Assets. The account_type field is used more
+       * to determine how the books look than the actual account type.
+       */
+
+      using accountsTable_t = std::tuple<std::string,    // [0] accounts.guid
+      std::string,    // [1] accounts.parent_guid
+      std::string,    // [2] accounts.name
+      std::string,    // [3] accounts.description
+      std::string,    // [4] accounts.commodity_guid
+      std::int32_t,   // [5] accounts.commodity_scu
+      std::int32_t,   // [6] accounts.non_std_scu
+      std::string>;   // [7] accounts.account_type
+
+      GCL::sqlWriter sqlWriter;
+      Wt::Dbo::collection<accountsTable_t>  accountCollection;
+      std::vector<accountsTable_t> accountVector; // The accountVector is used to store all the accounts as they are loaded.
+      std::string rootAccountGUID = tbl_books::rootAccountGUID(session);
+      std::vector<accountsTable_t>::size_type accountIndex = 0;
+
+      sqlWriter
+          .select({
+                    "guid",
+                    "parent_guid",
+                    "name",
+                    "description",
+                    "commodity_guid",
+                    "commodity_scu",
+                    "non_std_scu",
+                    "account_type"})
+          .from("accounts")
+          .where({ {"account_type", "=", szAccountTypes[accountType]},
+                   {"parent_guid", "=", GCL::sqlWriter::bindValue("?")} });
+
+      try
+      {
+        accountCollection = session.query<accountsTable_t>(sqlWriter.string()).bind(rootAccountGUID);
+        accountVector.insert(accountVector.end(), accountCollection.begin(), accountCollection.end());
+      }
+      catch(Wt::Dbo::Exception &e)
+      {
+        ERRORMESSAGE(e.what());
+      };
+
+      /* When iterating to find the entire account hierarchy, using iterators is not possible as if the memory in the vector needs
+       * to be reallocated if the vector grows, the iterators are invalidated.
+       * So rather than using iterators, lets use indexes into the vector.
+       */
+
+      sqlWriter.resetWhere();
+
+      sqlWriter.where("parent_guid", "=", GCL::sqlWriter::bindValue("?"));
+
+      do
+      {
+        try
+        {
+          accountCollection = session.query<accountsTable_t>(sqlWriter.string()).bind(std::get<1>(accountVector[accountIndex]));
+          accountVector.insert(accountVector.end(), accountCollection.begin(), accountCollection.end());
+        }
+        catch(Wt::Dbo::Exception &e)
+        {
+          ERRORMESSAGE(e.what());
+        };
+        accountIndex++;
+      }
+      while (accountIndex != accountVector.size());
 
       // Now create the hierarchy.
 
-    accountHierarchy.setRootValue(tbl_books::rootAccountGUID(session));
+      accountHierarchy.setRootValue(rootAccountGUID);
 
-    for (auto const element: accountVector)
-    {
-      accountHierarchy.insert(std::get<0>(element),
-                              std::get<1>(element),
-                              std::make_tuple(std::get<2>(element),
-                                              std::get<3>(element),
-                                              std::get<4>(element),
-                                              std::get<6>(element) == 0 ? std::get<5>(element) : std::get<6>(element),
-                                              0));
-    };
-  }
-
-  /// @brief Returns the commodity GUID for the specified account GUID.
-  /// @param[in] session: The session to use.
-  /// @param[in] accountGUID: The account GUID to find the currency for.
-  /// @returns A std::optional containing the commodityGUID if found.
-
-  std::optional<std::string> tbl_accounts::commodityGUID(Wt::Dbo::Session &session, std::string const &accountGUID)
-  {
-    std::optional<std::string> returnValue;
-    GCL::sqlWriter sqlWriter;
-
-    sqlWriter.select({"commodity_guid"}).from("accounts").where("guid", "=", accountGUID);
-    try
-    {
-      Wt::Dbo::Transaction transaction(session);
-
-      returnValue = session.query<std::string>(sqlWriter.string());
+      for (auto const element: accountVector)
+      {
+        accountHierarchy.insert(std::get<0>(element),
+                                std::get<1>(element),
+                                std::make_tuple(std::get<7>(element),
+                                                std::get<2>(element),
+                                                std::get<3>(element),
+                                                std::get<4>(element),
+                                                std::get<6>(element) == 0 ? std::get<5>(element) : std::get<6>(element),
+                                                0));
+      };
     }
-    catch(Wt::Dbo::Exception &e)
+
+    /// @brief Returns the commodity GUID for the specified account GUID.
+    /// @param[in] session: The session to use.
+    /// @param[in] accountGUID: The account GUID to find the currency for.
+    /// @returns A std::optional containing the commodityGUID if found.
+
+    std::optional<std::string> commodityGUID(Wt::Dbo::Session &session, std::string const &accountGUID)
     {
-      ERRORMESSAGE(e.what());
-    };
+      std::optional<std::string> returnValue;
+      GCL::sqlWriter sqlWriter;
 
+      sqlWriter.select({"commodity_guid"}).from("accounts").where("guid", "=", accountGUID);
+      try
+      {
+        Wt::Dbo::Transaction transaction(session);
 
-    return returnValue;
-  }
+        returnValue = session.query<std::string>(sqlWriter.string());
+      }
+      catch(Wt::Dbo::Exception &e)
+      {
+        ERRORMESSAGE(e.what());
+      };
 
+      return returnValue;
+    }
 
+  } // namespace tbl_accounts
 } // namespace database

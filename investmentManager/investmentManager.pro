@@ -88,7 +88,8 @@ SOURCES += \
     source/database/tbl_applicationData.cpp \
     source/core/functions/guid.cpp \
     source/database/tbl_splits.cpp \
-    source/core/functions/fraction.cpp
+    source/core/functions/fraction.cpp \
+    source/core/accountTransactions/assetValue.cpp
 
 HEADERS += \
     include/application.h \
@@ -123,7 +124,8 @@ HEADERS += \
     include/core/guid.hpp \
     include/core/functions/guid.h \
     include/database/tbl_splits.h \
-    include/core/functions/fraction.h
+    include/core/functions/fraction.h \
+    include/core/accountTransactions/assetValue.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
 LIBS += -L/usr/local/lib -lboost_system
