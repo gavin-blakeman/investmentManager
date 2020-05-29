@@ -63,8 +63,8 @@ namespace core
       database::tbl_accounts::accountHierarchy_t assetAccountHierarchy("");
       database::tbl_accounts::accountHierarchy_t liabilityAccountHierarchy("");
 
-      database::tbl_accounts::buildHierarchy(session, database::tbl_accounts::ASSET, assetAccountHierarchy);
-      database::tbl_accounts::buildHierarchy(session, database::tbl_accounts::LIABILITY, liabilityAccountHierarchy);
+      database::tbl_accounts::buildHierarchy(session, database::tbl_accounts::H_ASSET, assetAccountHierarchy);
+      database::tbl_accounts::buildHierarchy(session, database::tbl_accounts::H_LIABILITY, liabilityAccountHierarchy);
     }
   }
 }

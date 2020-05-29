@@ -50,6 +50,10 @@
 
 #include <SCL>
 
+  // investmentMananger Header Files
+
+#include "include/config.h"
+
 /* The accounts table has the following default layout;
  *  > guid - varchar(32)
  *  > name - varchar(2048)
@@ -84,11 +88,22 @@ namespace database
   {
     enum EHierarchyType
     {
+      H_ASSET,
+      H_INCOME,
+      H_EXPENSE,
+      H_EQUITY,
+      H_LIABILITY,
+    };
+    enum EAccountType
+    {
       ASSET,
-      INCOME,
-      EXPENSE,
+      BANK,
       EQUITY,
+      EXPENSE,
+      INCOME,
       LIABILITY,
+      ROOT,
+      STOCK,
     };
 
     using accountHierarchy_t = SCL::hierarchy<std::string,                  ///< account.guid
@@ -100,9 +115,10 @@ namespace database
                                                          double>>;          ///< value
 
     void buildHierarchy(Wt::Dbo::Session &, EHierarchyType, accountHierarchy_t &);
-    std::optional<double> accountValue(Wt::Dbo::Session &, std::string, std::tm &);
-
+    std::optional<money_t> accountValue(Wt::Dbo::Session &, std::string const &, std::tm const &);
+    std::optional<EAccountType> accountType(Wt::Dbo::Session &, std::string const &);
     std::optional<std::string> commodityGUID(Wt::Dbo::Session &, std::string const &);
+
 
   }  // namespace tbl_accounts
 }   // namespace database

@@ -125,7 +125,8 @@ HEADERS += \
     include/core/functions/guid.h \
     include/database/tbl_splits.h \
     include/core/functions/fraction.h \
-    include/core/accountTransactions/assetValue.h
+    include/core/accountTransactions/assetValue.h \
+    include/config.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
 LIBS += -L/usr/local/lib -lboost_system

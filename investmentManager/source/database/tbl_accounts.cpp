@@ -45,6 +45,8 @@
 
   // Miscellaneous library header files
 
+#include <boost/assign.hpp>
+#include <boost/bimap.hpp>
 #include <GCL>
 
   // investmentManager header files
@@ -55,14 +57,58 @@ namespace database
 {
   namespace tbl_accounts
   {
-    static std::unordered_map< tbl_accounts::EHierarchyType, std::string> szAccountTypes =
+    static std::unordered_map<EHierarchyType, std::string> szAccountTypes =
     {
-      {tbl_accounts::ASSET, "ASSET"},
-      {tbl_accounts::INCOME, "INCOME"},
-      {tbl_accounts::EXPENSE, "EXPENSE"},
-      {tbl_accounts::EQUITY, "EQUITY"},
-      {tbl_accounts::LIABILITY, "LIABILITY"},
+      {H_ASSET, "ASSET"},
+      {H_INCOME, "INCOME"},
+      {H_EXPENSE, "EXPENSE"},
+      {H_EQUITY, "EQUITY"},
+      {H_LIABILITY, "LIABILITY"},
     };
+
+    using accountType_t = boost::bimap<EAccountType, std::string>;
+
+    static accountType_t accountTypes = boost::assign::list_of<accountType_t::relation>
+                                        (ASSET, "ASSET")
+                                        (BANK, "BANK")
+                                        (EQUITY, "EQUITY")
+                                        (EXPENSE, "EXPENSE")
+                                        (INCOME, "INCOME")
+                                        (LIABILITY, "LIABILITY")
+                                        (ROOT, "ROOT")
+                                        (STOCK, "STOCK");
+
+    /// @brief Determines the account type for the guid specified.
+    /// @param[in] session: The Dbo session to use.
+    /// @param[in] accountGUID: The guid of the account to use.
+    /// @throws GCL::CRuntimeAssert
+    /// @version 2020-05-29/GGB - Function created.
+
+    std::optional<EAccountType> accountType(Wt::Dbo::Session &session, std::string const &accountGUID)
+    {
+      RUNTIME_ASSERT(investmentManager, accountGUID.size() == 32, "GUID length must == 32");
+
+      std::optional<EAccountType> returnValue;
+      GCL::sqlWriter sqlWriter;
+
+      sqlWriter.select({"account_type"}).from("accounts").where("guid", "=", accountGUID);
+
+      try
+      {
+        Wt::Dbo::Transaction transaction(session);
+
+        std::string ats = session.query<std::string>(sqlWriter.string());
+
+        returnValue = accountTypes.right.at(ats);
+      }
+      catch(Wt::Dbo::Exception &e)
+      {
+        ERRORMESSAGE(e.what());
+      };
+
+      return returnValue;
+
+    }
 
     /// @brief Determines the account value of the specified account.
     /// @details This function is more complicate than it looks at first. To determine the value of stock or bond accounts takes
@@ -73,9 +119,58 @@ namespace database
     /// @throws
     /// @version 2020-05-27/GGB - Function created.
 
-    std::optional<double> accountValue(Wt::Dbo::Session &session, std::string, std::tm &)
+    std::optional<money_t> accountValue(Wt::Dbo::Session &session, std::string const &accountGUID, std::tm const &closingDate)
     {
+      RUNTIME_ASSERT(investmentManager, accountGUID.size() == 32, "GUID length must == 32");
 
+      using transactionValue_t = std::tuple<double, double, double, double>;
+
+      GCL::sqlWriter sqlWriter;
+
+      Wt::Dbo::collection<transactionValue_t>  valueCollection;
+      std::vector<transactionValue_t> valueVector; // The accountVector is used to store all the accounts as they are loaded.
+
+      EAccountType szAccountType = *accountType(session, accountGUID);
+
+        /* Run a query to read all the records with a date less than the closing date. These can then be summed in memory
+         * to determine the account value.
+         */
+
+      sqlWriter
+          .select({"splits.value_num",
+                   "splits.value_denom",
+                   "splits.quantity.num",
+                   "splits.quantity_denom"})
+          .from("transactions")
+          .join({{"transactions", "guid", GCL::sqlWriter::JOIN_LEFT, "slits", "tx_guid"}})
+          .where({{"splits.account_guid", "=", accountGUID},
+                                               {"transaction.post_date", "<=", closingDate}});
+      try
+      {
+        Wt::Dbo::Transaction transaction(session);
+
+        valueCollection = session.query<transactionValue_t>(sqlWriter.string());
+        valueVector.assign(valueCollection.begin(), valueCollection.end());
+
+      }
+      catch(Wt::Dbo::Exception &e)
+      {
+        ERRORMESSAGE(e.what());
+      };
+
+      money_t moneyValue = 0;
+      shareCount_t shareValue = 0;
+
+      for (auto const &transaction : valueVector)
+      {
+        moneyValue += (std::get<0>(transaction) / std::get<1>(transaction));
+        shareValue += (std::get<2>(transaction) / std::get<3>(transaction));
+      };
+
+      if (szAccountType = STOCK)
+      {
+          // Return value based on stock value. Need to convert to a money value.
+      };
     }
 
     /// @brief Returns an account hierarchy for a specific type of accounts.
@@ -96,13 +191,13 @@ namespace database
        */
 
       using accountsTable_t = std::tuple<std::string,    // [0] accounts.guid
-      std::string,    // [1] accounts.parent_guid
-      std::string,    // [2] accounts.name
-      std::string,    // [3] accounts.description
-      std::string,    // [4] accounts.commodity_guid
-      std::int32_t,   // [5] accounts.commodity_scu
-      std::int32_t,   // [6] accounts.non_std_scu
-      std::string>;   // [7] accounts.account_type
+                                         std::string,    // [1] accounts.parent_guid
+                                         std::string,    // [2] accounts.name
+                                         std::string,    // [3] accounts.description
+                                         std::string,    // [4] accounts.commodity_guid
+                                         std::int32_t,   // [5] accounts.commodity_scu
+                                         std::int32_t,   // [6] accounts.non_std_scu
+                                         std::string>;   // [7] accounts.account_type
 
       GCL::sqlWriter sqlWriter;
       Wt::Dbo::collection<accountsTable_t>  accountCollection;
@@ -127,7 +222,7 @@ namespace database
       try
       {
         accountCollection = session.query<accountsTable_t>(sqlWriter.string()).bind(rootAccountGUID);
-        accountVector.insert(accountVector.end(), accountCollection.begin(), accountCollection.end());
+        accountVector.assign(accountCollection.begin(), accountCollection.end());
       }
       catch(Wt::Dbo::Exception &e)
       {
@@ -182,6 +277,8 @@ namespace database
 
     std::optional<std::string> commodityGUID(Wt::Dbo::Session &session, std::string const &accountGUID)
     {
+      RUNTIME_ASSERT(investmentManager, accountGUID.size() == 32, "GUID length must == 32");
+
       std::optional<std::string> returnValue;
       GCL::sqlWriter sqlWriter;
 
