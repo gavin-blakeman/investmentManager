@@ -52,7 +52,7 @@ namespace core
 
   inline char toChar(std::uint_least8_t i)
   {
-    RUNTIME_ASSERT("InvestmentManager", i < 16, "Parameter must be < 16.");
+    RUNTIME_ASSERT(i < 16, "Parameter must be < 16.");
 
     char returnValue;
 

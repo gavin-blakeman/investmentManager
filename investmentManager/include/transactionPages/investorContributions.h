@@ -38,7 +38,7 @@
 namespace transactions
 {
 
-  class CInvestorContributions : CTransactionPage
+  class CInvestorContributions : public CTransactionPage
   {
   private:
 
@@ -52,6 +52,11 @@ namespace transactions
     CInvestorContributions(CApplication *parent);
 
     virtual void createPage() override;
+
+    static std::unique_ptr<CTransactionPage> createClass(CApplication *parent)
+    {
+      return std::make_unique<CInvestorContributions>(parent);
+    }
   };
 
 } // namespace transactions

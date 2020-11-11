@@ -89,7 +89,7 @@ namespace models
       Wt::Dbo::collection<std::tuple<std::int32_t, std::int32_t, std::int32_t, std::string, std::string>> transactionResult;
 
       transactionResult = sqlSession.query<std::tuple<std::int32_t, std::int32_t, std::int32_t, std::string, std::string>>
-              ("SELECT DISTINCT im_menuItems.ID, im_transactions.parentID, "
+              ("SELECT DISTINCT im_menuItems.ID, im_menuItems.parentID, "
                "                im_menuItems.SortOrder, im_menuItems.MenuText, im_menuItems.TransactionCode " \
                "FROM im_menuItems");
 

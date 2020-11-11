@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                tbl_prices
-// SUBSYSTEM:           gnuCash prices table
+// FILE:                transactionPages/commodityTrading.h
+// SUBSYSTEM:           Manage purchase/sale of commodities
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -26,52 +26,57 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-11-11/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef TBL_PRICES_H
-#define TBL_PRICES_H
+#ifndef COMMODITYTRADING_H
+#define COMMODITYTRADING_H
 
-// C++ standard library header files
+  // Wt++ framework header files
 
-#include <cstdint>
-#include <string>
+#include "Wt/WComboBox.h"
+#include "Wt/WPushButton.h"
+#include "Wt/WTableView.h"
 
-// Wt++ framework header files
+  // investmentManager header files
 
-#include <Wt/Dbo/Dbo.h>
-#include <Wt/Dbo/Types.h>
-#include <Wt/Dbo/Session.h>
-#include <Wt/WAbstractTableModel.h>
-#include <Wt/WGlobal.h>
-#include <Wt/WDate.h>
+#include "transactionPage.h"
 
-// Miscellaneous library header files
-
-#include <boost/filesystem.hpp>
-#include <MCL>
-
-// investmentManager header files
-
-#include "include/config.h"
-#include "include/database/databaseDefinitions.h"
-#include "include/database/databaseTables.h"
-#include "include/core/priceUpload/priceUploadManager.h"
-
-namespace database
+namespace transactions
 {
-  namespace tbl_prices
+
+  class CCommodityTrading : public CTransactionPage
   {
-    std::string const SOURCE_FINANCE = "Finance::Quote";
-    std::string const SOURCE_USER = "user:price";
-    std::string const TYPE_TRANSACTION = "transaction";
-    std::string const TYPE_LAST = "last";
+  private:
+    Wt::WPushButton *pushButtonBuy = nullptr;
+    Wt::WPushButton *pushButtonSell = nullptr;
+    Wt::WPushButton *pushButtonSplit = nullptr;
+    Wt::WPushButton *pushButtonDividend = nullptr;
+    Wt::WComboBox *comboBoxNamespace = nullptr;
+    Wt::WComboBox *comboBoxCommodity = nullptr;
+    Wt::WTableView *tableViewTransactions = nullptr;
 
-    std::optional<money_t> closingPrice(Wt::Dbo::Session &, std::string const &, std::tm const &);
-    void priceUpload(Wt::Dbo::Session &, std::string const &, boost::filesystem::path const &);
+    CCommodityTrading() = delete;
+    CCommodityTrading(CCommodityTrading const &) = delete;
+    CCommodityTrading(CCommodityTrading const &&) = delete;
+    CCommodityTrading operator= (CCommodityTrading const &) = delete;
 
-  } // namespace tbl_prices
-} // namespace database
+    void comboBoxNamespaceChanged(Wt::WString);
+    void comboBoxCommodityChanged(Wt::WString);
 
-#endif // TBL_PRICES_H
+
+  public:
+    CCommodityTrading(CApplication *parent);
+
+    virtual void createPage() override;
+
+    static std::unique_ptr<CTransactionPage> createClass(CApplication *parent)
+    {
+      return std::make_unique<CCommodityTrading>(parent);
+    }
+  };
+
+} // namespace transactions
+
+#endif // COMMODITYTRADING_H

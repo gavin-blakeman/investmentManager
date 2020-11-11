@@ -33,17 +33,16 @@
 TARGET = investmentManager.wt
 TEMPLATE = app
 
-#QT += core
 QT -= gui core
 
 CONFIG += console
 CONFIG -= app_bundle
-CONFIG += object_parallel_to_source
+CONFIG += object_parallel_to_source link_prl
 
-QMAKE_CXXFLAGS += -std=c++17 -static -static-libgcc -DWT_CPP17_ANY_IMPLEMENTATION=std
+QMAKE_CXXFLAGS += -std=c++17 -static-libgcc -DWT_CPP17_ANY_IMPLEMENTATION=std
 DEFINES += BOOST_THREAD_USE_LIB QT_GUI_LIB QT_CORE_LIB
 
-#OBJECTS_DIR = "objects"
+OBJECTS_DIR = "objects"
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -57,16 +56,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH +=  \
+    "../ACL" \
     "../GCL" \
     "../MCL" \
-    "/home/gavin/Documents/Projects/software/Library/Boost/boost_1_71_0" \
     "../SCL"
 
 SOURCES += \
     source/application.cpp \
+    source/core/commodityTransactions/valueOverview.cpp \
     source/database/session.cpp \
+    source/models/commodityTransactions.cpp \
     source/models/menuModel.cpp \
     source/permissionSystem.cpp \
+    source/transactionPages/commodityTrading.cpp \
     source/views/menuView.cpp \
     source/database/tbl_users.cpp \
     source/configSettings.cpp \
@@ -93,11 +95,15 @@ SOURCES += \
 
 HEADERS += \
     include/application.h \
+    include/core/commodityTransactions/valueOverview.h \
+    include/core/helper.h \
     include/database/database \
     include/database/databaseDefinitions.h \
     include/database/databaseTables.h \
     include/database/session.h \
     include/database/tbl_users.h \
+    include/models/commodityTransactions.h \
+    include/transactionPages/commodityTrading.h \
     include/transactionPages/transactionPage.h \
     include/models/menuModel.h \
     include/mainMenu.h \
@@ -129,11 +135,18 @@ HEADERS += \
     include/config.h
 
 LIBS += -L/usr/lib -lwt -lwthttp -lwtdbo -lwtdbomysql
+LIBS += -L/usr/local/lib -lboost_date_time
+LIBS += -L/usr/local/lib -lboost_chrono
 LIBS += -L/usr/local/lib -lboost_system
 LIBS += -L/usr/local/lib -lboost_filesystem
 LIBS += -L/usr/local/lib -lboost_thread
 LIBS += -L/usr/local/lib -lboost_program_options
+LIBS += -L/usr/local/lib -lboost_locale
+LIBS += -L../ACL -lACL
 LIBS += -L../GCL -lGCL
+LIBS += -L../MCL -lMCL
+LIBS += -L../QCL -lQCL
+LIBS += -L../SCL -lSCL
 
 DISTFILES += \
     menu.md \

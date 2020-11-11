@@ -44,6 +44,7 @@
   // investmentManager header files
 
 #include "include/core/functions/guid.h"
+#include "include/core/helper.h"
 
 namespace database
 {

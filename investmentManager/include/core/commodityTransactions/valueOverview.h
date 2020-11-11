@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                config.h
-// SUBSYSTEM:           Application Configuration (typedefs)
+// FILE:                core/commodityTransactions/valueOverview.h
+// SUBSYSTEM:           Create a value overview (all transactions) for a commodity.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -24,19 +24,65 @@
 //                      You should have received a copy of the GNU General Public License along with investmentManager.  If not,
 //                      see <http://www.gnu.org/licenses/>.
 //
-// OVERVIEW:						Application configuration
+// OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-11-11/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef VALUEOVERVIEW_H
+#define VALUEOVERVIEW_H
+
+  // Standard C++ library header files
 
 #include <cstdint>
+#include <string>
+#include <tuple>
+#include <vector>
 
-using accountingValue_t = double; // May want to change this in the future.
-using money_t = double;       // May want to change this in the future.
-using shareCount_t = double;  // May want to change this in the future.
+  // Wt++ framework header files
 
-#endif // CONFIG_H
+  // Miscellaneous library header files
+
+#include <ACL>
+
+  // investmentManager header files
+
+#include "include/config.h"
+
+
+namespace core::commodityTransactions
+{
+
+  class CValueOverview
+  {
+  private:
+    struct STransaction
+    {
+      ACL::TJD date;
+      std::uint8_t transactionType;
+      shareCount_t shareCount;
+      accountingValue_t sharePrice;
+      accountingValue_t totalShareValue;
+      accountingValue_t transactionCosts;
+      shareCount_t cumulativeShares;
+      accountingValue_t capitalLoss;
+      accountingValue_t STCG;
+      accountingValue_t LTCG;
+      accountingValue_t taxableValue;
+    };
+
+    using transactions = std::vector<STransaction>;
+
+
+    CValueOverview() = delete;
+    CValueOverview(CValueOverview const &) = delete;
+    CValueOverview(CValueOverview &&) = delete;
+
+  public:
+    CValueOverview(std::string const &);
+  };
+
+}
+
+#endif // VALUEOVERVIEW_H

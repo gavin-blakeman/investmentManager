@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                config.h
-// SUBSYSTEM:           Application Configuration (typedefs)
+// FILE:                /core/helper.h
+// SUBSYSTEM:           Helper functions
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -24,19 +24,31 @@
 //                      You should have received a copy of the GNU General Public License along with investmentManager.  If not,
 //                      see <http://www.gnu.org/licenses/>.
 //
-// OVERVIEW:						Application configuration
+// OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-05-27/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef HELPER_H
+#define HELPER_H
 
-#include <cstdint>
+  // Standard C++ library header files
 
-using accountingValue_t = double; // May want to change this in the future.
-using money_t = double;       // May want to change this in the future.
-using shareCount_t = double;  // May want to change this in the future.
+#include <ctime>
 
-#endif // CONFIG_H
+  // Miscellaneous library header files.
+
+#include <SCL>
+
+namespace SCL
+{
+  template<>
+  inline std::string any::Manager_external<std::tm>::S_toString(any const *anyp)
+  {
+    auto ptr = static_cast<std::tm const *>(anyp->dataStorage.heapPointer);
+    return std::string();
+  }
+}
+
+#endif // HELPER_H

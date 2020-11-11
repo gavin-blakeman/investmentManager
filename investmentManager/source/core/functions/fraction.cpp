@@ -53,8 +53,8 @@ namespace fraction
 
   MCL::fraction_t composeFraction(double value, std::uint_least8_t decimalDigits)
   {
-    RUNTIME_ASSERT("Fraction", std::abs(value) <= std::numeric_limits<std::int64_t>::max(), "value >= maximum value stored in fraction");
-    RUNTIME_ASSERT("Fraction", decimalDigits <= 10, "Use decimal digits <= 10");
+    RUNTIME_ASSERT(std::abs(value) <= std::numeric_limits<std::int64_t>::max(), "value >= maximum value stored in fraction");
+    RUNTIME_ASSERT(decimalDigits <= 10, "Use decimal digits <= 10");
 
     std::int64_t n, d;
 

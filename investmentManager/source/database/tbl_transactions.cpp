@@ -36,15 +36,17 @@
 
 #include <Wt/Dbo/Transaction.h>
 
-  // Standard C++ library header files
+  // Miscellaneous library header files
 
 #include <GCL>
+#include <SCL>
 
 std::ostream &operator<<(std::ostream &, std::tm const &);
 
   // investmentManager header files
 
 #include "include/core/functions/guid.h"
+#include "include/core/helper.h"
 
 namespace database
 {

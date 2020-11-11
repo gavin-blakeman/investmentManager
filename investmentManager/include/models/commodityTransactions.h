@@ -1,12 +1,12 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                pricesModel
-// SUBSYSTEM:           Model for displaying prices.
+// FILE:                models/commodityTransactions.h
+// SUBSYSTEM:           Model to manage the commodity transactions.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
-// NAMESPACE:           N/A
+// NAMESPACE:           models
 // AUTHOR:							Gavin Blakeman.
 // LICENSE:             GPLv2
 //
@@ -26,20 +26,19 @@
 //
 // OVERVIEW:
 //
-// HISTORY:             2020-04-25/GGB - File created.
+// HISTORY:             2020-11-11/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef PRICESMODEL_H
-#define PRICESMODEL_H
-
-  // Standard C++ library header files
+#ifndef MODEL_COMMODITYTRANSACTIONS_H
+#define MODEL_COMMODITYTRANSACTIONS_H
+// Standard C++ library header files
 
 #include <map>
 #include <optional>
 #include <string>
 
-  // Wt++ framework header files
+// Wt++ framework header files
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/Session.h>
@@ -48,14 +47,37 @@
 #include <Wt/WGlobal.h>
 #include <Wt/WDate.h>
 
-  // investmentManager header files
+// investmentManager header files
 
 #include <include/database/database>
 #include "include/database/session.h"
 
 namespace models
 {
-  class CPricesModel: public Wt::WAbstractTableModel
+
+  /* The commodity transaction table has columns for:
+   *    Date
+   *    Transaction type (Buy, Sell, Divident, Split, Merge)
+   *    Number of shares (+ or -)
+   *    Share Price
+   *    Transaction Costs
+   *    Cumulative Shares (calculation)
+   *    Capital Loss    (If shares have not been sold "---")
+   *    STCG            (If shares have not been sold "---")
+   *    LTCG            (If shares have not been sold "---")
+   *    Taxable         (If shares have not been sold "---")
+   *
+   *  Also calculate
+   *    The current position using the last price.
+   *    The current gain/loss
+   *    The current MIRR/XIRR
+   *
+   * To enable this to work correctly, all the share transactions are required to be loaded and processed every time. It may be
+   * possible to add an archive flag, IE when a transaction is completed (sold) and does not need to be used, the flag can be
+   * set and then the record avoided unless specifically requested.
+   */
+
+  class CComodityTransactions: public Wt::WAbstractTableModel
   {
   private:
     using SRecord = std::tuple<Wt::WDate, std::string, std::string, std::int64_t, std::int64_t>;
@@ -68,15 +90,15 @@ namespace models
     std::uint64_t cacheReadRecords = 1024;        ///< Number of records to read at a time.
     std::uint64_t recordCount;                    ///< Number of records in the current recordSet.
 
-    CPricesModel() = delete;
-    CPricesModel(CPricesModel const &) = delete;
-    CPricesModel(CPricesModel &&) = delete;
-    CPricesModel &operator =(CPricesModel const &) = delete;
+    CComodityTransactions() = delete;
+    CComodityTransactions(CComodityTransactions const &) = delete;
+    CComodityTransactions(CComodityTransactions &&) = delete;
+    CComodityTransactions &operator =(CComodityTransactions const &) = delete;
 
     void readRecords(std::uint64_t) const;
 
   public:
-    CPricesModel(Wt::Dbo::Session &);
+    CComodityTransactions(Wt::Dbo::Session &);
 
     void changeCommodity(std::string const &);
 
@@ -90,4 +112,4 @@ namespace models
   };
 }
 
-#endif // PRICESMODEL_H
+#endif // MODEL_COMMODITYTRANSACTIONS_H

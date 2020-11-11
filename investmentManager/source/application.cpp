@@ -30,7 +30,7 @@
 //
 //**********************************************************************************************************************************
 
-#include "../include/application.h"
+#include "include/application.h"
 
   // Standard C++ library header files.
 
@@ -58,6 +58,7 @@
 
 #include <include/database/database>
 #include "include/configSettings.h"
+#include "include/transactionPages/commodityTrading.h"
 #include "include/transactionPages/priceManager.h"
 #include "include/views/menuView.h"
 
@@ -200,6 +201,8 @@ void CApplication::createTransactionMap()
 
   transactionPages.emplace(TC::MD110, std::make_pair(std::unique_ptr<transactions::CTransactionPage>(),
                                                      transactions::CPriceManager::createClass));
+  transactionPages.emplace(TC::MD200, std::make_pair(std::unique_ptr<transactions::CTransactionPage>(),
+                                                     transactions::CCommodityTrading::createClass));
 }
 
 /// @brief Creates the initial UI. This will be modified as required by the various transactions.

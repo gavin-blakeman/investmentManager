@@ -92,7 +92,7 @@ namespace dialogs
         boost::filesystem::path filename = file->uploadedFile().clientFileName();
         boost::filesystem::path fn = filename.stem();
 
-        database::priceUpload(session, filename.string(), file->uploadedFile().spoolFileName());
+        database::tbl_prices::priceUpload(session, filename.string(), file->uploadedFile().spoolFileName());
       };
     };
 

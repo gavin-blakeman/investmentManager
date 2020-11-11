@@ -1,8 +1,8 @@
 ﻿//**********************************************************************************************************************************
 //
 // PROJECT:             Investment Manager
-// FILE:                config.h
-// SUBSYSTEM:           Application Configuration (typedefs)
+// FILE:                core/commodityTransactions/valueOverview.h
+// SUBSYSTEM:           Create a value overview (all transactions) for a commodity.
 // LANGUAGE:						C++
 // TARGET OS:           LINUX
 // LIBRARY DEPENDANCE:	None.
@@ -24,19 +24,15 @@
 //                      You should have received a copy of the GNU General Public License along with investmentManager.  If not,
 //                      see <http://www.gnu.org/licenses/>.
 //
-// OVERVIEW:						Application configuration
+// OVERVIEW:
 //
-// HISTORY:             2020-04-19/GGB - File created.
+// HISTORY:             2020-11-11/GGB - File created.
 //
 //**********************************************************************************************************************************
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#include "include/core/commodityTransactions/valueOverview.h"
 
-#include <cstdint>
+namespace core::commodityTransactions
+{
 
-using accountingValue_t = double; // May want to change this in the future.
-using money_t = double;       // May want to change this in the future.
-using shareCount_t = double;  // May want to change this in the future.
-
-#endif // CONFIG_H
+}

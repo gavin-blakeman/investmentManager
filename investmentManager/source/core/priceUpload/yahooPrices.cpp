@@ -41,9 +41,10 @@
   // Miscellaneous library header files
 
 #include "boost/algorithm/string.hpp"
-#include <boost/format.hpp>
-#include "boost/lexical_cast.hpp"
 #include "boost/filesystem/fstream.hpp"
+#include "boost/format.hpp"
+#include "boost/lexical_cast.hpp"
+#include "boost/locale.hpp"
 #include <GCL>
 
 namespace core
@@ -55,11 +56,11 @@ namespace core
                                                             &CYahooPriceUpload::validateFunction,
                                                             &CYahooPriceUpload::uploadFileFunction));
 
-    /// @brief Validates a file as a Yahoo prices file.
-    /// @param[in] filename: The name of the file to validate.
-    /// @returns true - The file is a Yahoo prices file.
+    /// @brief      Validates a file as a Yahoo prices file.
+    /// @param[in]  filename: The name of the file to validate.
+    /// @returns    true - The file is a Yahoo prices file.
     /// @throws
-    /// @version 2020-04-26/GGB - Function created.
+    /// @version    2020-04-26/GGB - Function created.
 
     bool CYahooPriceUpload::validateFunction(boost::filesystem::path const &filename)
     {
@@ -89,7 +90,8 @@ namespace core
         if (szLine == "Date,Open,High,Low,Close,Adj Close,Volume")    // Crude - I know.
         {
           returnValue = true;
-          INFOMESSAGE(boost::str(boost::format("File %s validated as Yahoo prices file.") % filename));
+          INFOMESSAGE(boost::locale::translate(boost::str(boost::format("File %s validated as Yahoo prices file.") % filename)));
+
         };
 
         ifs.close();

@@ -65,6 +65,13 @@ namespace core
 
       database::tbl_accounts::buildHierarchy(session, database::tbl_accounts::H_ASSET, assetAccountHierarchy);
       database::tbl_accounts::buildHierarchy(session, database::tbl_accounts::H_LIABILITY, liabilityAccountHierarchy);
+
+        /* With the hierarcies available, we can now calculate the value of each account. This needs to be done individually
+         * by running the query on each account to determine the value at the relevant date. This is done by iterating over the set
+         * and summing each transaction.
+         */
+
+
     }
   }
 }
